@@ -1,16 +1,12 @@
 # kael_file_browser
+A simple Flutter project to open, move, delete or run script to deal with your photos and videos.
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+For now, just tested this app on Linux.
+## TODO
+- [x] View photo
+- [x] Open folder
+- [ ] Run shell/script
+- [ ] Custom bottom button and shell/script
+- [ ] Shortcut
+- [ ] Custom Shortcut
+- [ ] View video
