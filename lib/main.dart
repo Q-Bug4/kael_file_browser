@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-// import 'package:path/path.dart' as path;
+import 'package:filesystem_picker/filesystem_picker.dart';
 
 void main() => runApp(const MyApp());
 
@@ -30,30 +30,48 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<File> imgs = List<File>.empty();
   int imgIdx = 0;
-  String direcctory = "";
-  String imgPath = "/home/kael/Pictures/CoolMarket/1.jpg";
+  String path = "";
+  // Directory directory = Directory("");
 
   @override
   void initState() {
-    direcctory = "/home/kael/Pictures/CoolMarket/";
-    print(Directory(direcctory).listSync());
-    imgs = Directory(direcctory).listSync().map((e) => File(e.path)).toList();
+    path = "/home/kael/Pictures/CoolMarket/";
+    imgs = Directory(path).listSync().map((e) => File(e.path)).toList();
     super.initState();
+  }
+
+  openFolder(String path) {
+    setState(() {
+      imgs = Directory(path).listSync().map((e) => File(e.path)).toList();
+      imgIdx = 0;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // appBar: AppBar(
-        //   title: const Text('Sample Code'),
-        // ),
         body: Center(
             child: PhotoView(
-          imageProvider: AssetImage(imgs.length > 0 ? imgs[imgIdx].path : ""),
+          imageProvider: AssetImage(imgs.isNotEmpty ? imgs[imgIdx].path : ""),
         )),
         bottomNavigationBar: ButtonBar(
           children: [
-            ElevatedButton(onPressed: () {}, child: Text("Open folder")),
+            ElevatedButton(
+                onPressed: () async {
+                  String folder = await FilesystemPicker.open(
+                        title: 'Open folder',
+                        context: context,
+                        rootDirectory: Directory("/home"),
+                        fsType: FilesystemType.folder,
+                        pickText: 'Pick folder',
+                      ) ??
+                      "";
+                  setState(() {
+                    path = folder;
+                    openFolder(path);
+                  });
+                },
+                child: const Text("Open folder")),
             ElevatedButton(
                 onPressed: () {
                   setState(() {

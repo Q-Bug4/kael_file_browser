@@ -30,6 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   photo_view: 0.14.0
+  filesystem_picker: ^3.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
