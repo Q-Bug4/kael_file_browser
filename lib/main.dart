@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:kael_file_browser/util.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 
@@ -31,12 +32,10 @@ class _HomePageState extends State<HomePage> {
   List<File> imgs = List<File>.empty();
   int imgIdx = 0;
   String path = "";
-  // Directory directory = Directory("");
 
   @override
   void initState() {
-    path = "/home/kael/Pictures/CoolMarket/";
-    imgs = Directory(path).listSync().map((e) => File(e.path)).toList();
+    imgs = List<File>.empty();
     super.initState();
   }
 
@@ -49,6 +48,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    String userDir = Util.getUserDirectory();
     return Scaffold(
         body: Center(
             child: PhotoView(
@@ -61,11 +61,12 @@ class _HomePageState extends State<HomePage> {
                   String folder = await FilesystemPicker.open(
                         title: 'Open folder',
                         context: context,
-                        rootDirectory: Directory("/home"),
+                        rootDirectory: Directory(userDir),
+                        directory: path.isNotEmpty ? Directory(path) : null,
                         fsType: FilesystemType.folder,
                         pickText: 'Pick folder',
                       ) ??
-                      "";
+                      path;
                   setState(() {
                     path = folder;
                     openFolder(path);
