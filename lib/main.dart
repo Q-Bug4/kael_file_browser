@@ -33,6 +33,31 @@ class _HomePageState extends State<HomePage> {
   int imgIdx = 0;
   String path = "";
 
+  Future<void> _showMyDialog(String title, String content) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: content.split("\n").map((e) => Text(e)).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     imgs = List<File>.empty();
@@ -46,6 +71,18 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  removeItemOffList() {
+    if (imgs.isEmpty) {
+      return;
+    }
+    imgs.removeAt(imgIdx);
+    setState(() {
+      if (imgs.isNotEmpty) {
+        imgIdx %= imgs.length;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     String userDir = Util.getUserDirectory();
@@ -56,6 +93,21 @@ class _HomePageState extends State<HomePage> {
         )),
         bottomNavigationBar: ButtonBar(
           children: [
+            ElevatedButton(
+                onPressed: () {
+                  if (imgs.isEmpty) {
+                    return;
+                  }
+                  Process.run('mv', [imgs[imgIdx].path, '/home/kael/tmp/'])
+                      .then((result) {
+                    if (result.stderr.toString().isNotEmpty) {
+                      _showMyDialog('Command error', result.stderr.toString());
+                      return;
+                    }
+                    removeItemOffList();
+                  });
+                },
+                child: const Text("Run shell")),
             ElevatedButton(
                 onPressed: () async {
                   String folder = await FilesystemPicker.open(
