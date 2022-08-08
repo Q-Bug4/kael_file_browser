@@ -5,7 +5,8 @@ For now, just tested this app on Linux.
 ## TODO
 - [x] View photo
 - [x] Open folder
-- [ ] Run shell/script
+- [x] Run shell/script
+- [x] Dialog with shell error msg
 - [ ] Custom bottom button and shell/script
 - [ ] Shortcut
 - [ ] Custom Shortcut
