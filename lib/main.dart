@@ -4,8 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
+// import 'package:dart_vlc_ffi/dart_vlc_ffi.dart';
+import 'package:dart_vlc/dart_vlc.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  await DartVLC.initialize(useFlutterNativeView: true);
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -32,6 +37,7 @@ class _HomePageState extends State<HomePage> {
   List<File> imgs = List<File>.empty();
   int imgIdx = 0;
   String path = "";
+  final player = Player(id: 60002);
 
   Future<void> _showMyDialog(String title, String content) {
     return showDialog<void>(
@@ -88,11 +94,22 @@ class _HomePageState extends State<HomePage> {
     String userDir = Util.getUserDirectory();
     return Scaffold(
         body: Center(
-            child: PhotoView(
-          imageProvider: AssetImage(imgs.isNotEmpty ? imgs[imgIdx].path : ""),
+            //   child: PhotoView(
+            // imageProvider: AssetImage(imgs.isNotEmpty ? imgs[imgIdx].path : ""),
+            child: Video(
+          player: player,
+          height: 1920.0,
+          width: 1080.0,
+          scale: 1.0, // default
+          showControls: false, // default
         )),
         bottomNavigationBar: ButtonBar(
           children: [
+            ElevatedButton(
+                onPressed: () {
+                  player.open(Media.file(File('/home/kael/tmp/1.jpg')));
+                },
+                child: const Text("play")),
             ElevatedButton(
                 onPressed: () {
                   if (imgs.isEmpty) {
