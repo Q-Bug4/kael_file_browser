@@ -1,4 +1,6 @@
+import 'dart:ffi';
 import 'dart:io';
+import 'package:path/path.dart' as Path;
 
 class Util {
   static String getUserDirectory() {
@@ -12,5 +14,25 @@ class Util {
       home = envVars['UserProfile'] ?? home;
     }
     return home;
+  }
+
+  static bool isVideo(String filename) {
+    List exts = List.of(<String>[
+      '.mp4',
+      '.mov',
+      '.wmv',
+      '.avi',
+      '.avchd',
+      '.flv,',
+      '.f4v,',
+      '.swf',
+      '.mkv'
+    ]);
+    return exts.contains(Path.extension(filename));
+  }
+
+  static bool isImage(String filename) {
+    List exts = List.of(<String>['.jpg', 'jpeg', 'png', 'gif']);
+    return exts.contains(Path.extension(filename));
   }
 }

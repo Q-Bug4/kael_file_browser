@@ -4,8 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
+// import 'package:dart_vlc_ffi/dart_vlc_ffi.dart';
+import 'package:dart_vlc/dart_vlc.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  await DartVLC.initialize(useFlutterNativeView: true);
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -29,9 +34,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<File> imgs = List<File>.empty();
-  int imgIdx = 0;
+  List<File> items = List<File>.empty();
+  int itemIdx = 0;
   String path = "";
+  final player = Player(id: 60002);
 
   Future<void> _showMyDialog(String title, String content) {
     return showDialog<void>(
@@ -60,45 +66,67 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    imgs = List<File>.empty();
+    items = List<File>.empty();
     super.initState();
   }
 
   openFolder(String path) {
     setState(() {
-      imgs = Directory(path).listSync().map((e) => File(e.path)).toList();
-      imgIdx = 0;
+      items = Directory(path).listSync().map((e) => File(e.path)).toList();
+      itemIdx = 0;
     });
   }
 
   removeItemOffList() {
-    if (imgs.isEmpty) {
+    if (items.isEmpty) {
       return;
     }
-    imgs.removeAt(imgIdx);
+    items.removeAt(itemIdx);
     setState(() {
-      if (imgs.isNotEmpty) {
-        imgIdx %= imgs.length;
+      if (items.isNotEmpty) {
+        itemIdx %= items.length;
       }
     });
+  }
+
+  void playVideo() {
+    player.open(Media.file(File(items[itemIdx].path)));
   }
 
   @override
   Widget build(BuildContext context) {
     String userDir = Util.getUserDirectory();
+    bool isVideo = items.isNotEmpty && Util.isVideo(items[itemIdx].path);
+    if (isVideo) {
+      playVideo();
+    } else {
+      player.pause();
+    }
     return Scaffold(
         body: Center(
-            child: PhotoView(
-          imageProvider: AssetImage(imgs.isNotEmpty ? imgs[imgIdx].path : ""),
-        )),
+            //   child: PhotoView(
+            // imageProvider: AssetImage(imgs.isNotEmpty ? imgs[imgIdx].path : ""),
+            child: items.isNotEmpty
+                ? (isVideo
+                    ? Video(
+                        player: player,
+                        height: 1920.0,
+                        width: 1080.0,
+                        scale: 1.0, // default
+                        showControls: true, // default
+                      )
+                    : PhotoView(
+                        imageProvider: AssetImage(
+                            items.isNotEmpty ? items[itemIdx].path : "")))
+                : const Text("Please pick a folder")),
         bottomNavigationBar: ButtonBar(
           children: [
             ElevatedButton(
                 onPressed: () {
-                  if (imgs.isEmpty) {
+                  if (items.isEmpty) {
                     return;
                   }
-                  Process.run('mv', [imgs[imgIdx].path, '/home/kael/tmp/'])
+                  Process.run('mv', [items[itemIdx].path, '/home/kael/tmp/'])
                       .then((result) {
                     if (result.stderr.toString().isNotEmpty) {
                       _showMyDialog('Command error', result.stderr.toString());
@@ -128,27 +156,20 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    imgIdx--;
-                    imgIdx = (imgIdx + imgs.length) % imgs.length;
+                    itemIdx--;
+                    itemIdx = (itemIdx + items.length) % items.length;
                   });
                 },
-                child: Text("Last")),
+                child: const Text("Last")),
             ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    imgIdx++;
-                    imgIdx %= imgs.length;
+                    itemIdx++;
+                    itemIdx %= items.length;
                   });
                 },
-                child: Text("Next")),
+                child: const Text("Next")),
           ],
-        )
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () =>
-        //       setState(() => imgPath = "/home/kael/Pictures/CoolMarket/2.jpg"),
-        //   tooltip: 'Increment Counter',
-        //   child: const Icon(Icons.add),
-        // ),
-        );
+        ));
   }
 }

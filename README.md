@@ -10,4 +10,4 @@ For now, just tested this app on Linux.
 - [ ] Custom bottom button and shell/script
 - [ ] Shortcut
 - [ ] Custom Shortcut
-- [ ] View video
+- [x] View video
