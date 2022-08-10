@@ -72,7 +72,11 @@ class _HomePageState extends State<HomePage> {
 
   openFolder(String path) {
     setState(() {
-      items = Directory(path).listSync().map((e) => File(e.path)).toList();
+      items = Directory(path)
+          .listSync()
+          .where((p) => Util.isImage(p.path) || Util.isVideo(p.path))
+          .map((e) => File(e.path))
+          .toList();
       itemIdx = 0;
     });
   }
@@ -104,14 +108,10 @@ class _HomePageState extends State<HomePage> {
     }
     return Scaffold(
         body: Center(
-            //   child: PhotoView(
-            // imageProvider: AssetImage(imgs.isNotEmpty ? imgs[imgIdx].path : ""),
             child: items.isNotEmpty
                 ? (isVideo
                     ? Video(
                         player: player,
-                        height: 1920.0,
-                        width: 1080.0,
                         scale: 1.0, // default
                         showControls: true, // default
                       )
