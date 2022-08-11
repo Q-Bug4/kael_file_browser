@@ -72,6 +72,19 @@ class _HomePageState extends State<HomePage> {
     player.open(Media.file(File(items[itemIdx].path)));
   }
 
+  void move(String dst) {
+    if (items.isEmpty) {
+      return;
+    }
+    Process.run('mv', [items[itemIdx].path, dst]).then((result) {
+      if (result.stderr.toString().isNotEmpty) {
+        _showMyDialog('Command error', result.stderr.toString());
+        return;
+      }
+      removeItemOffList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     String userDir = Util.getUserDirectory();
@@ -81,6 +94,50 @@ class _HomePageState extends State<HomePage> {
     } else {
       player.pause();
     }
+    Map<String, String> alias2dst = {
+      "tmp": "/home/kael/tmp",
+      "pic": "/home/kael/Pictures/"
+    };
+    List<ElevatedButton> btns = alias2dst.entries
+        .map((e) => ElevatedButton(
+            onPressed: () => move(e.value), child: Text("[Mv] ${e.key}")))
+        .toList();
+
+    btns.addAll(List<ElevatedButton>.of(<ElevatedButton>[
+      ElevatedButton(
+          onPressed: () async {
+            String folder = await FilesystemPicker.open(
+                  title: 'Open folder',
+                  context: context,
+                  rootDirectory: Directory(userDir),
+                  directory: path.isNotEmpty ? Directory(path) : null,
+                  fsType: FilesystemType.folder,
+                  pickText: 'Pick folder',
+                ) ??
+                path;
+            setState(() {
+              path = folder;
+              openFolder(path);
+            });
+          },
+          child: const Text("Open folder")),
+      ElevatedButton(
+          onPressed: () {
+            setState(() {
+              itemIdx--;
+              itemIdx = (itemIdx + items.length) % items.length;
+            });
+          },
+          child: const Text("Last")),
+      ElevatedButton(
+          onPressed: () {
+            setState(() {
+              itemIdx++;
+              itemIdx %= items.length;
+            });
+          },
+          child: const Text("Next"))
+    ]));
     return Scaffold(
         body: Center(
             child: items.isNotEmpty
@@ -95,56 +152,7 @@ class _HomePageState extends State<HomePage> {
                             items.isNotEmpty ? items[itemIdx].path : "")))
                 : const Text("Please pick a folder")),
         bottomNavigationBar: ButtonBar(
-          children: [
-            ElevatedButton(
-                onPressed: () {
-                  if (items.isEmpty) {
-                    return;
-                  }
-                  Process.run('mv', [items[itemIdx].path, '/home/kael/tmp/'])
-                      .then((result) {
-                    if (result.stderr.toString().isNotEmpty) {
-                      _showMyDialog('Command error', result.stderr.toString());
-                      return;
-                    }
-                    removeItemOffList();
-                  });
-                },
-                child: const Text("Run shell")),
-            ElevatedButton(
-                onPressed: () async {
-                  String folder = await FilesystemPicker.open(
-                        title: 'Open folder',
-                        context: context,
-                        rootDirectory: Directory(userDir),
-                        directory: path.isNotEmpty ? Directory(path) : null,
-                        fsType: FilesystemType.folder,
-                        pickText: 'Pick folder',
-                      ) ??
-                      path;
-                  setState(() {
-                    path = folder;
-                    openFolder(path);
-                  });
-                },
-                child: const Text("Open folder")),
-            ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    itemIdx--;
-                    itemIdx = (itemIdx + items.length) % items.length;
-                  });
-                },
-                child: const Text("Last")),
-            ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    itemIdx++;
-                    itemIdx %= items.length;
-                  });
-                },
-                child: const Text("Next")),
-          ],
+          children: btns,
         ));
   }
 
