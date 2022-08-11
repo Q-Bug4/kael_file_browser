@@ -39,31 +39,6 @@ class _HomePageState extends State<HomePage> {
   String path = "";
   final player = Player(id: 60002);
 
-  Future<void> _showMyDialog(String title, String content) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: content.split("\n").map((e) => Text(e)).toList(),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   void initState() {
     items = List<File>.empty();
@@ -171,5 +146,30 @@ class _HomePageState extends State<HomePage> {
                 child: const Text("Next")),
           ],
         ));
+  }
+
+  Future<void> _showMyDialog(String title, String content) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: content.split("\n").map((e) => Text(e)).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
