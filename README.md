@@ -7,7 +7,9 @@ For now, just tested this app on Linux.
 - [x] Open folder
 - [x] Run shell/script
 - [x] Dialog with shell error msg
-- [ ] Custom bottom button and shell/script
+- [ ] Custom file movement
+- [ ] Undo movement
+- [ ] ~~Custom bottom button and shell/script~~
 - [ ] Shortcut
 - [ ] Custom Shortcut
 - [x] View video
