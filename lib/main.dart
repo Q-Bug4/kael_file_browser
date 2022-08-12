@@ -39,31 +39,6 @@ class _HomePageState extends State<HomePage> {
   String path = "";
   final player = Player(id: 60002);
 
-  Future<void> _showMyDialog(String title, String content) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: content.split("\n").map((e) => Text(e)).toList(),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   void initState() {
     items = List<File>.empty();
@@ -72,7 +47,11 @@ class _HomePageState extends State<HomePage> {
 
   openFolder(String path) {
     setState(() {
-      items = Directory(path).listSync().map((e) => File(e.path)).toList();
+      items = Directory(path)
+          .listSync()
+          .where((p) => Util.isImage(p.path) || Util.isVideo(p.path))
+          .map((e) => File(e.path))
+          .toList();
       itemIdx = 0;
     });
   }
@@ -104,14 +83,10 @@ class _HomePageState extends State<HomePage> {
     }
     return Scaffold(
         body: Center(
-            //   child: PhotoView(
-            // imageProvider: AssetImage(imgs.isNotEmpty ? imgs[imgIdx].path : ""),
             child: items.isNotEmpty
                 ? (isVideo
                     ? Video(
                         player: player,
-                        height: 1920.0,
-                        width: 1080.0,
                         scale: 1.0, // default
                         showControls: true, // default
                       )
@@ -171,5 +146,30 @@ class _HomePageState extends State<HomePage> {
                 child: const Text("Next")),
           ],
         ));
+  }
+
+  Future<void> _showMyDialog(String title, String content) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: content.split("\n").map((e) => Text(e)).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
