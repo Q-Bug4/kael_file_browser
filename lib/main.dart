@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kael_file_browser/movement.dart';
@@ -6,11 +7,19 @@ import 'package:photo_view/photo_view.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:path/path.dart' as Path;
-// import 'package:localstore/localstore.dart';
+import 'package:localstore/localstore.dart';
+
+final db = Localstore.instance;
+Map<String, String> alias2dst = Map();
 
 void main() async {
   await DartVLC.initialize(useFlutterNativeView: true);
-  // WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  Map<String, dynamic>? local =
+      await db.collection("custom_movement").doc("kael_file_browser").get();
+  if (local != null) {
+    alias2dst = local.map((key, value) => MapEntry(key, value.toString()));
+  }
   runApp(const MyApp());
 }
 
@@ -36,6 +45,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final doc = Localstore.instance
+      .collection("custom_movement")
+      .doc("kael_file_browser");
+
   List<File> items = List<File>.empty();
   List<Movement> movements = List.empty();
   int itemIdx = 0;
@@ -117,10 +130,7 @@ class _HomePageState extends State<HomePage> {
     } else {
       player.pause();
     }
-    Map<String, String> alias2dst = {
-      "tmp": "/home/kael/tmp",
-      "pic": "/home/kael/Pictures/"
-    };
+
     List<ElevatedButton> btns = alias2dst.entries
         .map((e) => ElevatedButton(
             onPressed: () {
@@ -130,7 +140,44 @@ class _HomePageState extends State<HomePage> {
         .toList();
 
     btns.addAll(List<ElevatedButton>.of(<ElevatedButton>[
-      ElevatedButton(onPressed: () {}, child: const Text("Edit movement")),
+      ElevatedButton(
+          onPressed: () async {
+            JsonEncoder encoder = const JsonEncoder.withIndent('  ');
+            TextEditingController controller =
+                TextEditingController(text: encoder.convert(alias2dst));
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                      title: const Text("Edit your movement"),
+                      content: TextField(
+                        autofocus: true,
+                        maxLines: null,
+                        controller: controller,
+                      ),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              db
+                                  .collection("custom_movement")
+                                  .doc("kael_file_browser")
+                                  .set(json.decode(controller.text))
+                                  .then((value) => {});
+                              setState(() {
+                                alias2dst =
+                                    Map.castFrom(json.decode(controller.text));
+                              });
+                            },
+                            child: const Text("确定")),
+                        TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("取消"))
+                      ],
+                    ));
+          },
+          child: const Text("Edit movement")),
       ElevatedButton(
           onPressed: () {
             undoMovement();

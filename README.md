@@ -9,7 +9,8 @@ For now, just tested this app on Linux.
 - [x] Run shell/script
 - [x] Dialog with shell error msg
 - [x] Undo movement
-- [ ] Custom file movement
+- [x] Custom file movement
+- [ ] Input validation
 - [ ] Shortcut
 - [ ] Custom Shortcut
 - [ ] ~~Custom bottom button and shell/script~~

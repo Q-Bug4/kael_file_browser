@@ -14,15 +14,21 @@ class Movement {
     if (done || dst.isEmpty || src.isEmpty) {
       return;
     }
-    Util.moveFile(src, dst);
-    done = true;
+    String errMsg = Util.moveFile(src, dst);
+    if (errMsg.isEmpty) {
+      done = true;
+    }
+    return errMsg;
   }
 
   undo() {
     if (dst.isEmpty || src.isEmpty) {
       return;
     }
-    Util.moveFile(dst, src);
-    done = false;
+    String errMsg = Util.moveFile(dst, src);
+    if (errMsg.isEmpty) {
+      done = false;
+    }
+    return errMsg;
   }
 }
