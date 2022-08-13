@@ -1,14 +1,16 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:kael_file_browser/movement.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
-// import 'package:dart_vlc_ffi/dart_vlc_ffi.dart';
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:path/path.dart' as Path;
+// import 'package:localstore/localstore.dart';
 
 void main() async {
   await DartVLC.initialize(useFlutterNativeView: true);
+  // WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -35,6 +37,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<File> items = List<File>.empty();
+  List<Movement> movements = List.empty();
   int itemIdx = 0;
   String path = "";
   final player = Player(id: 60002);
@@ -53,6 +56,39 @@ class _HomePageState extends State<HomePage> {
           .map((e) => File(e.path))
           .toList();
       itemIdx = 0;
+      movements = List.empty(growable: true);
+    });
+  }
+
+  move(dst) {
+    if (items.isEmpty) {
+      return;
+    }
+    File file = items[itemIdx];
+    Movement movement =
+        Movement(src: file.path, dst: "$dst/${Path.basename(file.path)}");
+    String errMsg = movement.doMove();
+    if (errMsg.isNotEmpty) {
+      _showMyDialog("Movement error", errMsg);
+      return;
+    }
+    movements.add(movement);
+    removeItemOffList();
+  }
+
+  undoMovement() {
+    if (movements.isEmpty) {
+      return;
+    }
+    Movement movement = movements.removeLast();
+    String errMsg = movement.undo();
+    if (errMsg.isNotEmpty) {
+      _showMyDialog("Movement error", errMsg);
+      return;
+    }
+    setState(() {
+      items.add(File(movement.src));
+      itemIdx = items.length - 1;
     });
   }
 
@@ -72,19 +108,6 @@ class _HomePageState extends State<HomePage> {
     player.open(Media.file(File(items[itemIdx].path)));
   }
 
-  void move(String dst) {
-    if (items.isEmpty) {
-      return;
-    }
-    Process.run('mv', [items[itemIdx].path, dst]).then((result) {
-      if (result.stderr.toString().isNotEmpty) {
-        _showMyDialog('Command error', result.stderr.toString());
-        return;
-      }
-      removeItemOffList();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     String userDir = Util.getUserDirectory();
@@ -100,17 +123,27 @@ class _HomePageState extends State<HomePage> {
     };
     List<ElevatedButton> btns = alias2dst.entries
         .map((e) => ElevatedButton(
-            onPressed: () => move(e.value), child: Text("[Mv] ${e.key}")))
+            onPressed: () {
+              move(e.value);
+            },
+            child: Text("[Mv] ${e.key}")))
         .toList();
 
     btns.addAll(List<ElevatedButton>.of(<ElevatedButton>[
+      ElevatedButton(onPressed: () {}, child: const Text("Edit movement")),
+      ElevatedButton(
+          onPressed: () {
+            undoMovement();
+          },
+          child: const Text("Undo")),
       ElevatedButton(
           onPressed: () async {
             String folder = await FilesystemPicker.open(
                   title: 'Open folder',
                   context: context,
-                  rootDirectory: Directory(userDir),
-                  directory: path.isNotEmpty ? Directory(path) : null,
+                  rootDirectory: Directory("/"),
+                  directory:
+                      path.isNotEmpty ? Directory(path) : Directory(userDir),
                   fsType: FilesystemType.folder,
                   pickText: 'Pick folder',
                 ) ??

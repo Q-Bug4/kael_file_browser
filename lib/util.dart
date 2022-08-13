@@ -3,6 +3,13 @@ import 'dart:io';
 import 'package:path/path.dart' as Path;
 
 class Util {
+  static String moveFile(String src, String dst) {
+    if (src.isEmpty || dst.isEmpty) {
+      return "";
+    }
+    return Process.runSync('mv', [src, dst]).stderr.toString();
+  }
+
   static String getUserDirectory() {
     String home = "/";
     Map<String, String> envVars = Platform.environment;
@@ -32,7 +39,7 @@ class Util {
   }
 
   static bool isImage(String filename) {
-    List exts = List.of(<String>['.jpg', 'jpeg', 'png', 'gif']);
+    List exts = List.of(<String>['.jpg', '.jpeg', '.png', '.gif']);
     return exts.contains(Path.extension(filename));
   }
 }
