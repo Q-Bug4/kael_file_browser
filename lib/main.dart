@@ -45,23 +45,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final doc = Localstore.instance
-      .collection("custom_movement")
-      .doc("kael_file_browser");
-
   List<File> items = List<File>.empty();
-  List<Movement> movements = List.empty();
+  List<Movement> movements = List.empty(growable: true);
   int itemIdx = 0;
   String path = "";
   final player = Player(id: 60002);
 
-  @override
-  void initState() {
-    items = List<File>.empty();
-    super.initState();
-  }
-
-  openFolder(String path) {
+  void openFolder(String path) {
     setState(() {
       items = Directory(path)
           .listSync()
@@ -69,11 +59,12 @@ class _HomePageState extends State<HomePage> {
           .map((e) => File(e.path))
           .toList();
       itemIdx = 0;
-      movements = List.empty(growable: true);
+      movements.clear();
+      // movements = List.empty(growable: true);
     });
   }
 
-  move(dst) {
+  void move(dst) {
     if (items.isEmpty) {
       return;
     }
@@ -82,21 +73,21 @@ class _HomePageState extends State<HomePage> {
         Movement(src: file.path, dst: "$dst/${Path.basename(file.path)}");
     String errMsg = movement.doMove();
     if (errMsg.isNotEmpty) {
-      _showMyDialog("Movement error", errMsg);
+      Util.showInfoDialog(context, "Movement error", errMsg);
       return;
     }
     movements.add(movement);
     removeItemOffList();
   }
 
-  undoMovement() {
+  void undoMovement() {
     if (movements.isEmpty) {
       return;
     }
     Movement movement = movements.removeLast();
     String errMsg = movement.undo();
     if (errMsg.isNotEmpty) {
-      _showMyDialog("Movement error", errMsg);
+      Util.showInfoDialog(context, "Movement error", errMsg);
       return;
     }
     setState(() {
@@ -105,7 +96,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  removeItemOffList() {
+  void removeItemOffList() {
     if (items.isEmpty) {
       return;
     }
@@ -117,20 +108,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void playVideo() {
-    player.open(Media.file(File(items[itemIdx].path)));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    String userDir = Util.getUserDirectory();
-    bool isVideo = items.isNotEmpty && Util.isVideo(items[itemIdx].path);
-    if (isVideo) {
-      playVideo();
-    } else {
-      player.pause();
-    }
-
+  List<ElevatedButton> generateBtns() {
     List<ElevatedButton> btns = alias2dst.entries
         .map((e) => ElevatedButton(
             onPressed: () {
@@ -189,8 +167,9 @@ class _HomePageState extends State<HomePage> {
                   title: 'Open folder',
                   context: context,
                   rootDirectory: Directory("/"),
-                  directory:
-                      path.isNotEmpty ? Directory(path) : Directory(userDir),
+                  directory: path.isNotEmpty
+                      ? Directory(path)
+                      : Directory(Util.getUserDirectory()),
                   fsType: FilesystemType.folder,
                   pickText: 'Pick folder',
                 ) ??
@@ -218,46 +197,37 @@ class _HomePageState extends State<HomePage> {
           },
           child: const Text("Next"))
     ]));
-    return Scaffold(
-        body: Center(
-            child: items.isNotEmpty
-                ? (isVideo
-                    ? Video(
-                        player: player,
-                        scale: 1.0, // default
-                        showControls: true, // default
-                      )
-                    : PhotoView(
-                        imageProvider: AssetImage(
-                            items.isNotEmpty ? items[itemIdx].path : "")))
-                : const Text("Please pick a folder")),
-        bottomNavigationBar: ButtonBar(
-          children: btns,
-        ));
+    return btns;
   }
 
-  Future<void> _showMyDialog(String title, String content) {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: content.split("\n").map((e) => Text(e)).toList(),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+  Widget getMediaWidget() {
+    if (items.isEmpty) {
+      return const Text("Please pick a folder");
+    }
+    bool isVideo = Util.isVideo(items[itemIdx].path);
+    if (isVideo) {
+      player.open(Media.file(File(items[itemIdx].path)));
+    } else {
+      player.pause();
+    }
+
+    return isVideo
+        ? Video(
+            player: player,
+            scale: 1.0, // default
+            showControls: true, // default
+          )
+        : PhotoView(
+            imageProvider:
+                AssetImage(items.isNotEmpty ? items[itemIdx].path : ""));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: Center(child: getMediaWidget()),
+        bottomNavigationBar: ButtonBar(
+          children: generateBtns(),
+        ));
   }
 }

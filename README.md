@@ -11,6 +11,8 @@ For now, just tested this app on Linux.
 - [x] Undo movement
 - [x] Custom file movement
 - [ ] Input validation
+- [ ] Beautify movement input dialog
+- [ ] Wonderful video controll bar
 - [ ] Shortcut
 - [ ] Custom Shortcut
 - [ ] ~~Custom bottom button and shell/script~~
