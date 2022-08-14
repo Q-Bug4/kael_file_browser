@@ -10,8 +10,8 @@ For now, just tested this app on Linux.
 - [x] Dialog with shell error msg
 - [x] Undo movement
 - [x] Custom file movement
-- [ ] Input validation
-- [ ] Beautify movement input dialog
+- [x] Input validation
+- [x] Beautify movement input dialog
 - [ ] Wonderful video controll bar
 - [ ] Shortcut
 - [ ] Custom Shortcut

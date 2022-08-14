@@ -8,6 +8,7 @@ import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:path/path.dart' as Path;
 import 'package:localstore/localstore.dart';
+import 'package:json_editor/json_editor.dart';
 
 final db = Localstore.instance;
 Map<String, String> alias2dst = Map();
@@ -120,17 +121,16 @@ class _HomePageState extends State<HomePage> {
     btns.addAll(List<ElevatedButton>.of(<ElevatedButton>[
       ElevatedButton(
           onPressed: () async {
-            JsonEncoder encoder = const JsonEncoder.withIndent('  ');
-            TextEditingController controller =
-                TextEditingController(text: encoder.convert(alias2dst));
+            String jsonStr = "";
             showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
                       title: const Text("Edit your movement"),
-                      content: TextField(
-                        autofocus: true,
-                        maxLines: null,
-                        controller: controller,
+                      content: JsonEditor.object(
+                        object: alias2dst,
+                        onValueChanged: (val) {
+                          jsonStr = val.toString();
+                        },
                       ),
                       actions: [
                         TextButton(
@@ -139,11 +139,10 @@ class _HomePageState extends State<HomePage> {
                               db
                                   .collection("custom_movement")
                                   .doc("kael_file_browser")
-                                  .set(json.decode(controller.text))
+                                  .set(json.decode(jsonStr))
                                   .then((value) => {});
                               setState(() {
-                                alias2dst =
-                                    Map.castFrom(json.decode(controller.text));
+                                alias2dst = Map.castFrom(json.decode(jsonStr));
                               });
                             },
                             child: const Text("确定")),
