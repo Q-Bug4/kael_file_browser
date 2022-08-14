@@ -32,12 +32,14 @@ dependencies:
   photo_view: 0.14.0
   filesystem_picker: ^3.0.0
   dart_vlc: ^0.3.0
+  localstore: ^1.2.3
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   dart_vlc_ffi: ^0.1.8
+  json_editor: ^0.0.8
 
 dev_dependencies:
   flutter_test:

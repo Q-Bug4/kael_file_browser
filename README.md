@@ -4,12 +4,15 @@ A simple Flutter project to open, move, delete or run script to deal with your p
 For now, just tested this app on Linux.
 ## TODO
 - [x] View photo
+- [x] View video
 - [x] Open folder
 - [x] Run shell/script
 - [x] Dialog with shell error msg
-- [ ] Custom file movement
-- [ ] Undo movement
-- [ ] ~~Custom bottom button and shell/script~~
+- [x] Undo movement
+- [x] Custom file movement
+- [x] Input validation
+- [x] Beautify movement input dialog
+- [ ] Wonderful video controll bar
 - [ ] Shortcut
 - [ ] Custom Shortcut
-- [x] View video
+- [ ] ~~Custom bottom button and shell/script~~
