@@ -49,10 +49,27 @@ class _HomePageState extends State<HomePage> {
   List<File> items = List<File>.empty();
   List<Movement> movements = List.empty(growable: true);
   int itemIdx = 0;
-  String path = "";
-  final player = Player(id: 60002);
+  String path = "/home/kael/Videos/";
+  Player player = Player(id: 60002);
+  PositionState position = PositionState();
+  bool shouldAutoOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    player.positionStream.listen((PositionState state) {
+      if (state.duration!.inMilliseconds == 0) {
+        return;
+      }
+      shouldAutoOpen = false;
+      setState(() {
+        position = state;
+      });
+    });
+  }
 
   void openFolder(String path) {
+    shouldAutoOpen = true;
     setState(() {
       items = Directory(path)
           .listSync()
@@ -61,7 +78,6 @@ class _HomePageState extends State<HomePage> {
           .toList();
       itemIdx = 0;
       movements.clear();
-      // movements = List.empty(growable: true);
     });
   }
 
@@ -205,10 +221,13 @@ class _HomePageState extends State<HomePage> {
     }
     bool isVideo = Util.isVideo(items[itemIdx].path);
     if (isVideo) {
-      player.open(Media.file(File(items[itemIdx].path)));
+      if (shouldAutoOpen) {
+        player.open(Media.file(File(items[itemIdx].path)));
+      }
     } else {
       player.pause();
     }
+    shouldAutoOpen = true;
 
     return isVideo
         ? Video(
@@ -225,8 +244,24 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(child: getMediaWidget()),
-        bottomNavigationBar: ButtonBar(
-          children: generateBtns(),
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Slider(
+                min: 0,
+                max: position.duration!.inMilliseconds.toDouble(),
+                value: position.position!.inMilliseconds.toDouble(),
+                onChanged: (position) {
+                  player.seek(
+                    Duration(
+                      milliseconds: position.toInt(),
+                    ),
+                  );
+                }),
+            ButtonBar(
+              children: generateBtns(),
+            ),
+          ],
         ));
   }
 }
