@@ -210,7 +210,17 @@ class _HomePageState extends State<HomePage> {
               itemIdx %= items.length;
             });
           },
-          child: const Text("Next"))
+          child: const Text("Next")),
+      ElevatedButton(
+          onPressed: () {
+            if (position.position?.inMilliseconds ==
+                position.duration?.inMilliseconds) {
+              player.open(Media.file(File(items[itemIdx].path)));
+            } else {
+              player.playOrPause();
+            }
+          },
+          child: const Text("Play/Pause")),
     ]));
     return btns;
   }
@@ -233,7 +243,7 @@ class _HomePageState extends State<HomePage> {
         ? Video(
             player: player,
             scale: 1.0, // default
-            showControls: true, // default
+            showControls: false,
           )
         : PhotoView(
             imageProvider:

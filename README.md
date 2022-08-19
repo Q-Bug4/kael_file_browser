@@ -12,7 +12,7 @@ For now, just tested this app on Linux.
 - [x] Custom file movement
 - [x] Input validation
 - [x] Beautify movement input dialog
-- [ ] Wonderful video controll bar
+- [x] Video position controll bar
 - [ ] Shortcut
 - [ ] Custom Shortcut
 - [ ] ~~Custom bottom button and shell/script~~
