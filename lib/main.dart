@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/movement.dart';
 import 'package:kael_file_browser/util.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:path/path.dart' as Path;
@@ -47,29 +47,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<File> items = List<File>.empty();
-  List<Movement> movements = List.empty(growable: true);
   int itemIdx = 0;
+  List<Movement> movements = List.empty(growable: true);
   String path = "/home/kael/Videos/";
-  Player player = Player(id: 60002);
-  PositionState position = PositionState();
-  bool shouldAutoOpen = false;
-
-  @override
-  void initState() {
-    super.initState();
-    player.positionStream.listen((PositionState state) {
-      if (state.duration!.inMilliseconds == 0) {
-        return;
-      }
-      shouldAutoOpen = false;
-      setState(() {
-        position = state;
-      });
-    });
-  }
+  MediaPlayer mediaPlayer = MediaPlayer();
 
   void openFolder(String path) {
-    shouldAutoOpen = true;
     setState(() {
       items = Directory(path)
           .listSync()
@@ -77,6 +60,9 @@ class _HomePageState extends State<HomePage> {
           .map((e) => File(e.path))
           .toList();
       itemIdx = 0;
+      if (items.isNotEmpty) {
+        mediaPlayer.play(items[itemIdx]);
+      }
       movements.clear();
     });
   }
@@ -107,10 +93,9 @@ class _HomePageState extends State<HomePage> {
       Util.showInfoDialog(context, "Movement error", errMsg);
       return;
     }
-    setState(() {
-      items.add(File(movement.src));
-      itemIdx = items.length - 1;
-    });
+    items.add(File(movement.src));
+    itemIdx = items.length - 1;
+    mediaPlayer.play(items[itemIdx]);
   }
 
   void removeItemOffList() {
@@ -118,11 +103,20 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     items.removeAt(itemIdx);
-    setState(() {
-      if (items.isNotEmpty) {
-        itemIdx %= items.length;
-      }
-    });
+    if (items.isNotEmpty) {
+      itemIdx %= items.length;
+      mediaPlayer.play(items[itemIdx]);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: mediaPlayer,
+      bottomNavigationBar: ButtonBar(
+        children: generateBtns(),
+      ),
+    );
   }
 
   List<ElevatedButton> generateBtns() {
@@ -197,81 +191,24 @@ class _HomePageState extends State<HomePage> {
           child: const Text("Open folder")),
       ElevatedButton(
           onPressed: () {
-            setState(() {
-              itemIdx--;
-              itemIdx = (itemIdx + items.length) % items.length;
-            });
+            itemIdx--;
+            itemIdx = (itemIdx + items.length) % items.length;
+            mediaPlayer.play(items[itemIdx]);
           },
           child: const Text("Last")),
       ElevatedButton(
           onPressed: () {
-            setState(() {
-              itemIdx++;
-              itemIdx %= items.length;
-            });
+            itemIdx++;
+            itemIdx %= items.length;
+            mediaPlayer.play(items[itemIdx]);
           },
           child: const Text("Next")),
       ElevatedButton(
           onPressed: () {
-            if (position.position?.inMilliseconds ==
-                position.duration?.inMilliseconds) {
-              player.open(Media.file(File(items[itemIdx].path)));
-            } else {
-              player.playOrPause();
-            }
+            mediaPlayer.playOrPause();
           },
           child: const Text("Play/Pause")),
     ]));
     return btns;
-  }
-
-  Widget getMediaWidget() {
-    if (items.isEmpty) {
-      return const Text("Please pick a folder");
-    }
-    bool isVideo = Util.isVideo(items[itemIdx].path);
-    if (isVideo) {
-      if (shouldAutoOpen) {
-        player.open(Media.file(File(items[itemIdx].path)));
-      }
-    } else {
-      player.pause();
-    }
-    shouldAutoOpen = true;
-
-    return isVideo
-        ? Video(
-            player: player,
-            scale: 1.0, // default
-            showControls: false,
-          )
-        : PhotoView(
-            imageProvider:
-                AssetImage(items.isNotEmpty ? items[itemIdx].path : ""));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(child: getMediaWidget()),
-        bottomNavigationBar: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Slider(
-                min: 0,
-                max: position.duration!.inMilliseconds.toDouble(),
-                value: position.position!.inMilliseconds.toDouble(),
-                onChanged: (position) {
-                  player.seek(
-                    Duration(
-                      milliseconds: position.toInt(),
-                    ),
-                  );
-                }),
-            ButtonBar(
-              children: generateBtns(),
-            ),
-          ],
-        ));
   }
 }
