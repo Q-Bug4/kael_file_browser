@@ -12,14 +12,22 @@ import 'package:json_editor/json_editor.dart';
 
 final db = Localstore.instance;
 Map<String, String> alias2dst = Map();
+String activate = "";
+late Map<String, dynamic>? local;
 
 void main() async {
   await DartVLC.initialize(useFlutterNativeView: true);
   WidgetsFlutterBinding.ensureInitialized();
-  Map<String, dynamic>? local =
-      await db.collection("custom_movement").doc("kael_file_browser").get();
+  local = await db.collection("custom_movement").doc("kael_file_browser").get();
   if (local != null) {
-    alias2dst = local.map((key, value) => MapEntry(key, value.toString()));
+    activate = local!['activate'];
+    String jsonStr = local!['cases'][activate]
+        .toString()
+        .replaceAllMapped(RegExp(r'([/\w]+)'), (match) {
+      return '"${match.group(0)}"';
+    });
+    alias2dst = Map<String, dynamic>.from(jsonDecode(jsonStr))
+        .map((key, value) => MapEntry(key, value.toString()));
   }
   runApp(const MyApp());
 }
@@ -137,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                 builder: (context) => AlertDialog(
                       title: const Text("Edit your movement"),
                       content: JsonEditor.object(
-                        object: alias2dst,
+                        object: local,
                         onValueChanged: (val) {
                           jsonStr = val.toString();
                         },
@@ -151,8 +159,20 @@ class _HomePageState extends State<HomePage> {
                                   .doc("kael_file_browser")
                                   .set(json.decode(jsonStr))
                                   .then((value) => {});
+                              local = Map<String, dynamic>.from(
+                                  jsonDecode(jsonStr));
                               setState(() {
-                                alias2dst = Map.castFrom(json.decode(jsonStr));
+                                activate = local!['activate'];
+                                String movementStr = local!['cases'][activate]
+                                    .toString()
+                                    .replaceAllMapped(RegExp(r'([/\w]+)'),
+                                        (match) {
+                                  return '"${match.group(0)}"';
+                                });
+                                alias2dst = Map<String, dynamic>.from(
+                                        jsonDecode(movementStr))
+                                    .map((key, value) =>
+                                        MapEntry(key, value.toString()));
                               });
                             },
                             child: const Text("确定")),
