@@ -83,7 +83,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
             scale: 1.0, // default
             showControls: false,
           )
-        : PhotoView(imageProvider: AssetImage(file.path));
+        : PhotoView(imageProvider: FileImage(file));
 
     return Column(children: [
       Expanded(
