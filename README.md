@@ -16,3 +16,9 @@ For now, just tested this app on Linux.
 - [ ] Shortcut
 - [ ] Custom Shortcut
 - [ ] ~~Custom bottom button and shell/script~~
+
+## Bugs
+- [ ] Controll bar position overflow
+- [ ] Can not open some file because of filename
+- [ ] Broken file cause crash
+- [ ] Move the lastest file
