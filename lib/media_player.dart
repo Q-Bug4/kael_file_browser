@@ -14,6 +14,10 @@ class MediaPlayer extends StatefulWidget {
     state.playOrPause();
   }
 
+  void resetFile() {
+    state.resetFile();
+  }
+
   void play(File file) {
     state.play(file);
   }
@@ -30,6 +34,11 @@ class _MediaPlayerState extends State<MediaPlayer> {
   Player player = Player(id: 60002);
   PositionState position = PositionState();
   bool shouldAutoOpen = false;
+
+  void resetFile() {
+    file = EMPTY_FILE;
+    player.stop();
+  }
 
   void playOrPause() {
     if (file == EMPTY_FILE) {
@@ -53,7 +62,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
   @override
   void initState() {
     super.initState();
-    file = EMPTY_FILE;
+    resetFile();
     player.positionStream.listen((PositionState state) {
       if (state.duration!.inMilliseconds == 0) {
         return;
@@ -67,7 +76,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (file == EMPTY_FILE) {
+    if (!file.existsSync()) {
       return const Text("Please pick a folder");
     }
     bool isVideo = Util.isVideo(file.path);

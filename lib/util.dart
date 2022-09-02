@@ -27,6 +27,7 @@ class Util {
   static bool isVideo(String filename) {
     List exts = List.of(<String>[
       '.mp4',
+      '.m4v',
       '.mov',
       '.wmv',
       '.avi',
@@ -36,12 +37,12 @@ class Util {
       '.swf',
       '.mkv'
     ]);
-    return exts.contains(Path.extension(filename));
+    return exts.contains(Path.extension(filename.toLowerCase()));
   }
 
   static bool isImage(String filename) {
     List exts = List.of(<String>['.jpg', '.jpeg', '.png', '.gif']);
-    return exts.contains(Path.extension(filename));
+    return exts.contains(Path.extension(filename.toLowerCase()));
   }
 
   static Future<void> showInfoDialog(
