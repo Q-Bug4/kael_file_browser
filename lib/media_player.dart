@@ -14,6 +14,10 @@ class MediaPlayer extends StatefulWidget {
     state.playOrPause();
   }
 
+  void resetFile() {
+    state.resetFile();
+  }
+
   void play(File file) {
     state.play(file);
   }
@@ -31,29 +35,37 @@ class _MediaPlayerState extends State<MediaPlayer> {
   PositionState position = PositionState();
   bool shouldAutoOpen = false;
 
+  void resetFile() {
+    file = EMPTY_FILE;
+    player.stop();
+  }
+
   void playOrPause() {
     if (file == EMPTY_FILE) {
       return;
     }
     if (position.position?.inMilliseconds ==
         position.duration?.inMilliseconds) {
-      player.open(Media.file(file));
+      play(file);
     } else {
       player.playOrPause();
     }
   }
 
-  void play(File f) {
-    file = f;
-    setState(() {
-      player.open(Media.file(file));
-    });
+  void play(File? f) {
+    try {
+      file = f ?? file;
+      var media = Media.file(file);
+      player.open(media);
+    } catch (e) {
+      Util.showInfoDialog(context, 'Vlc Error', e.toString());
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    file = EMPTY_FILE;
+    resetFile();
     player.positionStream.listen((PositionState state) {
       if (state.duration!.inMilliseconds == 0) {
         return;
@@ -67,14 +79,14 @@ class _MediaPlayerState extends State<MediaPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (file == EMPTY_FILE) {
+    if (!file.existsSync()) {
       return const Text("Please pick a folder");
     }
     bool isVideo = Util.isVideo(file.path);
     if (!isVideo) {
       player.pause();
     } else if (shouldAutoOpen) {
-      player.open(Media.file(file));
+      play(file);
     }
     shouldAutoOpen = true;
     Widget widget = isVideo
@@ -91,18 +103,17 @@ class _MediaPlayerState extends State<MediaPlayer> {
       ),
       Container(
           height: 40,
-          child: Flexible(
-              child: Slider(
-                  min: 0,
-                  max: position.duration!.inMilliseconds.toDouble(),
-                  value: position.position!.inMilliseconds.toDouble(),
-                  onChanged: (position) {
-                    player.seek(
-                      Duration(
-                        milliseconds: position.toInt(),
-                      ),
-                    );
-                  })))
+          child: Slider(
+              min: 0,
+              max: position.duration!.inMilliseconds.toDouble(),
+              value: position.position!.inMilliseconds.toDouble(),
+              onChanged: (position) {
+                player.seek(
+                  Duration(
+                    milliseconds: position.toInt(),
+                  ),
+                );
+              }))
     ]);
   }
 }

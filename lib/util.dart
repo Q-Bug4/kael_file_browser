@@ -5,10 +5,21 @@ import 'package:path/path.dart' as Path;
 
 class Util {
   static String moveFile(String src, String dst) {
+    String msg = "";
     if (src.isEmpty || dst.isEmpty) {
-      return "";
+      return msg;
     }
-    return Process.runSync('mv', [src, dst]).stderr.toString();
+    try {
+      File dstTmp = File(dst);
+      if (!dstTmp.existsSync()) {
+        dstTmp.parent.createSync(recursive: true);
+      }
+      File(src).renameSync(dst);
+    } catch (e) {
+      msg = e.toString();
+    }
+    return msg;
+    // return Process.runSync('mv', [src, dst]).stderr.toString();
   }
 
   static String getUserDirectory() {
@@ -27,6 +38,7 @@ class Util {
   static bool isVideo(String filename) {
     List exts = List.of(<String>[
       '.mp4',
+      '.m4v',
       '.mov',
       '.wmv',
       '.avi',
@@ -36,12 +48,12 @@ class Util {
       '.swf',
       '.mkv'
     ]);
-    return exts.contains(Path.extension(filename));
+    return exts.contains(Path.extension(filename.toLowerCase()));
   }
 
   static bool isImage(String filename) {
     List exts = List.of(<String>['.jpg', '.jpeg', '.png', '.gif']);
-    return exts.contains(Path.extension(filename));
+    return exts.contains(Path.extension(filename.toLowerCase()));
   }
 
   static Future<void> showInfoDialog(

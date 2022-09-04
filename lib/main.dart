@@ -15,19 +15,23 @@ Map<String, String> alias2dst = Map();
 String activate = "";
 late Map<String, dynamic>? local;
 
+initLocal() async {
+  activate = local!['activate'];
+  String movementStr = local!['cases'][activate]
+      .toString()
+      .replaceAllMapped(RegExp(r'([/\w\.]+)'), (match) {
+    return '"${match.group(0)}"';
+  });
+  alias2dst = Map<String, dynamic>.from(jsonDecode(movementStr))
+      .map((key, value) => MapEntry(key, value.toString()));
+}
+
 void main() async {
   await DartVLC.initialize(useFlutterNativeView: true);
   WidgetsFlutterBinding.ensureInitialized();
   local = await db.collection("custom_movement").doc("kael_file_browser").get();
   if (local != null) {
-    activate = local!['activate'];
-    String jsonStr = local!['cases'][activate]
-        .toString()
-        .replaceAllMapped(RegExp(r'([/\w]+)'), (match) {
-      return '"${match.group(0)}"';
-    });
-    alias2dst = Map<String, dynamic>.from(jsonDecode(jsonStr))
-        .map((key, value) => MapEntry(key, value.toString()));
+    await initLocal();
   }
   runApp(const MyApp());
 }
@@ -57,10 +61,11 @@ class _HomePageState extends State<HomePage> {
   List<File> items = List<File>.empty();
   int itemIdx = 0;
   List<Movement> movements = List.empty(growable: true);
-  String path = "/home/kael/Videos/";
+  String path = "/home/kael/tmp/";
   MediaPlayer mediaPlayer = MediaPlayer();
 
   void openFolder(String path) {
+    Directory.current = Directory(path);
     setState(() {
       items = Directory(path)
           .listSync()
@@ -75,7 +80,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void move(dst) {
+  void move(String dst) {
     if (items.isEmpty) {
       return;
     }
@@ -114,6 +119,8 @@ class _HomePageState extends State<HomePage> {
     if (items.isNotEmpty) {
       itemIdx %= items.length;
       mediaPlayer.play(items[itemIdx]);
+    } else {
+      mediaPlayer.resetFile();
     }
   }
 
@@ -162,17 +169,7 @@ class _HomePageState extends State<HomePage> {
                               local = Map<String, dynamic>.from(
                                   jsonDecode(jsonStr));
                               setState(() {
-                                activate = local!['activate'];
-                                String movementStr = local!['cases'][activate]
-                                    .toString()
-                                    .replaceAllMapped(RegExp(r'([/\w]+)'),
-                                        (match) {
-                                  return '"${match.group(0)}"';
-                                });
-                                alias2dst = Map<String, dynamic>.from(
-                                        jsonDecode(movementStr))
-                                    .map((key, value) =>
-                                        MapEntry(key, value.toString()));
+                                initLocal();
                               });
                             },
                             child: const Text("确定")),
