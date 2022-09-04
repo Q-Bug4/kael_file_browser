@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
   List<File> items = List<File>.empty();
   int itemIdx = 0;
   List<Movement> movements = List.empty(growable: true);
-  String path = "/home/kael/Videos/";
+  String path = "/home/kael/tmp/";
   MediaPlayer mediaPlayer = MediaPlayer();
 
   void openFolder(String path) {

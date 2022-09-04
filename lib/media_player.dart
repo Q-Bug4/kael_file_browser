@@ -46,19 +46,20 @@ class _MediaPlayerState extends State<MediaPlayer> {
     }
     if (position.position?.inMilliseconds ==
         position.duration?.inMilliseconds) {
-      player.open(Media.file(file));
-      position = player.position;
+      play(file);
     } else {
       player.playOrPause();
     }
   }
 
-  void play(File f) {
-    file = f;
-    setState(() {
-      player.open(Media.file(file));
-      position = player.position;
-    });
+  void play(File? f) {
+    try {
+      file = f ?? file;
+      var media = Media.file(file);
+      player.open(media);
+    } catch (e) {
+      Util.showInfoDialog(context, 'Vlc Error', e.toString());
+    }
   }
 
   @override
@@ -85,8 +86,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
     if (!isVideo) {
       player.pause();
     } else if (shouldAutoOpen) {
-      player.open(Media.file(file));
-      position = player.position;
+      play(file);
     }
     shouldAutoOpen = true;
     Widget widget = isVideo
@@ -103,18 +103,17 @@ class _MediaPlayerState extends State<MediaPlayer> {
       ),
       Container(
           height: 40,
-          child: Flexible(
-              child: Slider(
-                  min: 0,
-                  max: position.duration!.inMilliseconds.toDouble(),
-                  value: position.position!.inMilliseconds.toDouble(),
-                  onChanged: (position) {
-                    player.seek(
-                      Duration(
-                        milliseconds: position.toInt(),
-                      ),
-                    );
-                  })))
+          child: Slider(
+              min: 0,
+              max: position.duration!.inMilliseconds.toDouble(),
+              value: position.position!.inMilliseconds.toDouble(),
+              onChanged: (position) {
+                player.seek(
+                  Duration(
+                    milliseconds: position.toInt(),
+                  ),
+                );
+              }))
     ]);
   }
 }
