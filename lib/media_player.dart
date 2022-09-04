@@ -47,6 +47,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
     if (position.position?.inMilliseconds ==
         position.duration?.inMilliseconds) {
       player.open(Media.file(file));
+      position = player.position;
     } else {
       player.playOrPause();
     }
@@ -56,6 +57,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
     file = f;
     setState(() {
       player.open(Media.file(file));
+      position = player.position;
     });
   }
 
@@ -84,6 +86,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
       player.pause();
     } else if (shouldAutoOpen) {
       player.open(Media.file(file));
+      position = player.position;
     }
     shouldAutoOpen = true;
     Widget widget = isVideo

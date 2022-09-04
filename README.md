@@ -18,7 +18,7 @@ For now, just tested this app on Linux.
 - [ ] ~~Custom bottom button and shell/script~~
 
 ## Bugs
-- [ ] Controll bar position overflow
+- [x] Controll bar position overflow
 - [ ] Can not open some file because of filename
 - [ ] Broken file cause crash
 - [ ] Move the lastest file
