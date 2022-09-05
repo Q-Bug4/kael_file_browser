@@ -36,12 +36,14 @@ class _MediaPlayerState extends State<MediaPlayer> {
   bool shouldAutoOpen = false;
 
   void resetFile() {
-    file = EMPTY_FILE;
-    player.stop();
+    setState(() {
+      file = EMPTY_FILE;
+      player.stop();
+    });
   }
 
   void playOrPause() {
-    if (file == EMPTY_FILE) {
+    if (!file.existsSync()) {
       return;
     }
     if (position.position?.inMilliseconds ==
