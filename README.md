@@ -14,12 +14,13 @@ For now, just tested this app on Linux.
 - [x] Beautify movement input dialog
 - [x] Video position controll bar
 - [ ] Gif control
+- [ ] Remember last open folder
 - [ ] Shortcut
 - [ ] Custom Shortcut
 - [ ] ~~Custom bottom button and shell/script~~
 
 ## Bugs
 - [x] Controll bar position overflow
+- [x] Set play blank after move the lastest file
 - [ ] Can not open some file because of filename
 - [ ] (In process) Broken file cause crash
-- [ ] Move the lastest file

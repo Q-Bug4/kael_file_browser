@@ -124,6 +124,18 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void addIdx(int addtion) {
+    if (items.isEmpty) {
+      itemIdx = 0;
+      return;
+    }
+    itemIdx += addtion;
+    while (itemIdx < 0) {
+      itemIdx += items.length;
+    }
+    itemIdx %= items.length;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -208,15 +220,13 @@ class _HomePageState extends State<HomePage> {
           child: const Text("Open folder")),
       ElevatedButton(
           onPressed: () {
-            itemIdx--;
-            itemIdx = (itemIdx + items.length) % items.length;
+            addIdx(-1);
             mediaPlayer.play(items[itemIdx]);
           },
           child: const Text("Last")),
       ElevatedButton(
           onPressed: () {
-            itemIdx++;
-            itemIdx %= items.length;
+            addIdx(1);
             mediaPlayer.play(items[itemIdx]);
           },
           child: const Text("Next")),
