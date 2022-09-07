@@ -15,6 +15,14 @@ Map<String, String> alias2dst = Map();
 String activate = "";
 late Map<String, dynamic>? local;
 
+setLocal(Map<String, dynamic> map) {
+  db
+      .collection("custom_movement")
+      .doc("kael_file_browser")
+      .set(map)
+      .then((value) => {});
+}
+
 initLocal() async {
   activate = local!['activate'];
   String movementStr = local!['cases'][activate]
@@ -61,11 +69,13 @@ class _HomePageState extends State<HomePage> {
   List<File> items = List<File>.empty();
   int itemIdx = 0;
   List<Movement> movements = List.empty(growable: true);
-  String path = "/home/kael/tmp/";
+  String path = local?['path'] ?? "/home/kael/tmp/";
   MediaPlayer mediaPlayer = MediaPlayer();
 
   void openFolder(String path) {
     Directory.current = Directory(path);
+    local!['path'] = path;
+    setLocal(local!);
     setState(() {
       items = Directory(path)
           .listSync()
@@ -173,23 +183,19 @@ class _HomePageState extends State<HomePage> {
                         TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
-                              db
-                                  .collection("custom_movement")
-                                  .doc("kael_file_browser")
-                                  .set(json.decode(jsonStr))
-                                  .then((value) => {});
+                              setLocal(json.decode(jsonStr));
                               local = Map<String, dynamic>.from(
                                   jsonDecode(jsonStr));
                               setState(() {
                                 initLocal();
                               });
                             },
-                            child: const Text("确定")),
+                            child: const Text("OK")),
                         TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: const Text("取消"))
+                            child: const Text("Cancel"))
                       ],
                     ));
           },
