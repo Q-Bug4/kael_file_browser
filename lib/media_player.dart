@@ -103,19 +103,21 @@ class _MediaPlayerState extends State<MediaPlayer> {
       Expanded(
         child: widget,
       ),
-      Container(
-          height: 40,
-          child: Slider(
-              min: 0,
-              max: position.duration!.inMilliseconds.toDouble(),
-              value: position.position!.inMilliseconds.toDouble(),
-              onChanged: (position) {
-                player.seek(
-                  Duration(
-                    milliseconds: position.toInt(),
-                  ),
-                );
-              }))
+      Util.isImage(file.path)
+          ? Container()
+          : Container(
+              height: 40,
+              child: Slider(
+                  min: 0,
+                  max: position.duration!.inMilliseconds.toDouble(),
+                  value: position.position!.inMilliseconds.toDouble(),
+                  onChanged: (position) {
+                    player.seek(
+                      Duration(
+                        milliseconds: position.toInt(),
+                      ),
+                    );
+                  }))
     ]);
   }
 }
