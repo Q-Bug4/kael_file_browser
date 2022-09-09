@@ -33,6 +33,7 @@ dependencies:
   filesystem_picker: ^3.0.0
   dart_vlc: ^0.3.0
   localstore: ^1.2.3
+  gif: ^2.1.2
 
 
   # The following adds the Cupertino Icons font to your application.

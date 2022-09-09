@@ -3,6 +3,7 @@ import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:gif/gif.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:photo_view/photo_view.dart';
 
@@ -28,7 +29,10 @@ class MediaPlayer extends StatefulWidget {
   }
 }
 
-class _MediaPlayerState extends State<MediaPlayer> {
+class _MediaPlayerState extends State<MediaPlayer>
+    with TickerProviderStateMixin {
+  late GifController gifController;
+  bool isGifPlaying = true;
   final File EMPTY_FILE = File('');
   late File file;
   Player player = Player(id: 60002);
@@ -46,19 +50,34 @@ class _MediaPlayerState extends State<MediaPlayer> {
     if (!file.existsSync()) {
       return;
     }
-    if (position.position?.inMilliseconds ==
-        position.duration?.inMilliseconds) {
-      play(file);
-    } else {
-      player.playOrPause();
+    if (Util.isGif(file.path)) {
+      if (isGifPlaying) {
+        gifController.value = gifController.value;
+      } else {
+        gifController.forward();
+      }
+      isGifPlaying = !isGifPlaying;
+    } else if (Util.isVideo(file.path)) {
+      if (position.position?.inMilliseconds ==
+          position.duration?.inMilliseconds) {
+        play(file);
+      } else {
+        player.playOrPause();
+      }
     }
   }
 
   void play(File? f) {
-    try {
+    setState(() {
       file = f ?? file;
-      var media = Media.file(file);
-      player.open(media);
+    });
+    // gifController = GifController(vsync: this);
+    isGifPlaying = true;
+    try {
+      if (Util.isVideo(file.path)) {
+        var media = Media.file(file);
+        player.open(media);
+      }
     } catch (e) {
       Util.showInfoDialog(context, 'Vlc Error', e.toString());
     }
@@ -67,6 +86,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
   @override
   void initState() {
     super.initState();
+    gifController = GifController(vsync: this);
     resetFile();
     player.positionStream.listen((PositionState state) {
       if (state.duration!.inMilliseconds == 0) {
@@ -81,43 +101,64 @@ class _MediaPlayerState extends State<MediaPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    if (!file.existsSync()) {
+    Widget widget;
+    if (Util.isImage(file.path)) {
+      widget = PhotoView(imageProvider: FileImage(file));
+    } else if (Util.isGif(file.path)) {
+      widget = Column(children: [
+        Expanded(
+          child: Gif(
+              controller: gifController,
+              autostart: Autostart.once,
+              image: FileImage(file)),
+        ),
+        Container(
+            height: 40,
+            child: AnimatedBuilder(
+              animation: gifController,
+              builder: (context, child) {
+                return Slider(
+                    value: gifController.value.toDouble(),
+                    onChanged: (position) {
+                      gifController.value = position;
+                      isGifPlaying = false;
+                    });
+              },
+            ))
+      ]);
+    } else if (Util.isVideo(file.path)) {
+      widget = Column(children: [
+        Expanded(
+          child: Video(
+            player: player,
+            scale: 1.0, // default
+            showControls: false,
+          ),
+        ),
+        Container(
+            height: 40,
+            child: Slider(
+                min: 0,
+                max: position.duration!.inMilliseconds.toDouble(),
+                value: position.position!.inMilliseconds.toDouble(),
+                onChanged: (position) {
+                  player.seek(
+                    Duration(
+                      milliseconds: position.toInt(),
+                    ),
+                  );
+                }))
+      ]);
+    } else {
       return const Text("Please pick a folder");
     }
-    bool isVideo = Util.isVideo(file.path);
-    if (!isVideo) {
+    if (!Util.isVideo(file.path)) {
       player.pause();
     } else if (shouldAutoOpen) {
       play(file);
     }
     shouldAutoOpen = true;
-    Widget widget = isVideo
-        ? Video(
-            player: player,
-            scale: 1.0, // default
-            showControls: false,
-          )
-        : PhotoView(imageProvider: FileImage(file));
 
-    return Column(children: [
-      Expanded(
-        child: widget,
-      ),
-      Util.isImage(file.path)
-          ? Container()
-          : Container(
-              height: 40,
-              child: Slider(
-                  min: 0,
-                  max: position.duration!.inMilliseconds.toDouble(),
-                  value: position.position!.inMilliseconds.toDouble(),
-                  onChanged: (position) {
-                    player.seek(
-                      Duration(
-                        milliseconds: position.toInt(),
-                      ),
-                    );
-                  }))
-    ]);
+    return widget;
   }
 }

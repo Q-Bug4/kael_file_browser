@@ -79,7 +79,10 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       items = Directory(path)
           .listSync()
-          .where((p) => Util.isImage(p.path) || Util.isVideo(p.path))
+          .where((p) =>
+              Util.isGif(p.path) ||
+              Util.isImage(p.path) ||
+              Util.isVideo(p.path))
           .map((e) => File(e.path))
           .toList();
       itemIdx = 0;
