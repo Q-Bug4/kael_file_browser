@@ -79,14 +79,23 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       items = Directory(path)
           .listSync()
-          .where((p) => Util.isImage(p.path) || Util.isVideo(p.path))
+          .where((p) =>
+              Util.isGif(p.path) ||
+              Util.isImage(p.path) ||
+              Util.isVideo(p.path))
           .map((e) => File(e.path))
           .toList();
       itemIdx = 0;
       if (items.isNotEmpty) {
-        mediaPlayer.play(items[itemIdx]);
+        playCurrentFile();
       }
       movements.clear();
+    });
+  }
+
+  void playCurrentFile() {
+    setState(() {
+      mediaPlayer.play(items[itemIdx]);
     });
   }
 
@@ -118,7 +127,7 @@ class _HomePageState extends State<HomePage> {
     }
     items.add(File(movement.src));
     itemIdx = items.length - 1;
-    mediaPlayer.play(items[itemIdx]);
+    playCurrentFile();
   }
 
   void removeItemOffList() {
@@ -128,7 +137,7 @@ class _HomePageState extends State<HomePage> {
     items.removeAt(itemIdx);
     if (items.isNotEmpty) {
       itemIdx %= items.length;
-      mediaPlayer.play(items[itemIdx]);
+      playCurrentFile();
     } else {
       mediaPlayer.resetFile();
     }
@@ -227,13 +236,13 @@ class _HomePageState extends State<HomePage> {
       ElevatedButton(
           onPressed: () {
             addIdx(-1);
-            mediaPlayer.play(items[itemIdx]);
+            playCurrentFile();
           },
           child: const Text("Last")),
       ElevatedButton(
           onPressed: () {
             addIdx(1);
-            mediaPlayer.play(items[itemIdx]);
+            playCurrentFile();
           },
           child: const Text("Next")),
       ElevatedButton(
