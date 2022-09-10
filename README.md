@@ -14,7 +14,7 @@ For now, just tested this app on Linux.
 - [x] Beautify movement input dialog
 - [x] Video position controll bar
 - [ ] Gif control
-- [ ] Remember last open folder
+- [x] Remember last open folder
 - [ ] Shortcut
 - [ ] Custom Shortcut
 - [ ] ~~Custom bottom button and shell/script~~
