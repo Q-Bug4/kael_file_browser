@@ -13,8 +13,9 @@ For now, just tested this app on Linux.
 - [x] Input validation
 - [x] Beautify movement input dialog
 - [x] Video position controll bar
-- [ ] Gif control
 - [x] Remember last open folder
+- [x] Only show control bar when playing videos or gifs
+- [ ] Gif control 
 - [ ] Shortcut
 - [ ] Custom Shortcut
 - [ ] ~~Custom bottom button and shell/script~~
@@ -22,5 +23,5 @@ For now, just tested this app on Linux.
 ## Bugs
 - [x] Controll bar position overflow
 - [x] Set play blank after move the lastest file
-- [ ] Can not open some file because of filename
+- [ ] Can not open files whose filename contains `#`
 - [ ] (In process) Broken file cause crash

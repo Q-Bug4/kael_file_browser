@@ -51,8 +51,13 @@ class Util {
     return exts.contains(Path.extension(filename.toLowerCase()));
   }
 
+  static bool isGif(String filename) {
+    List exts = List.of(<String>['.gif']);
+    return exts.contains(Path.extension(filename.toLowerCase()));
+  }
+
   static bool isImage(String filename) {
-    List exts = List.of(<String>['.jpg', '.jpeg', '.png', '.gif']);
+    List exts = List.of(<String>['.jpg', '.jpeg', '.png']);
     return exts.contains(Path.extension(filename.toLowerCase()));
   }
 
