@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/movement.dart';
+import 'package:kael_file_browser/side_fileinfo.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:dart_vlc/dart_vlc.dart';
@@ -159,7 +160,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: mediaPlayer,
+      body: Row(
+        children: [
+          Expanded(
+            child: mediaPlayer,
+          ),
+          SideFileinfo(),
+        ],
+      ),
       bottomNavigationBar: ButtonBar(
         children: generateBtns(),
       ),
