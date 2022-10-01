@@ -32,6 +32,7 @@ class MediaPlayer extends StatefulWidget {
 class _MediaPlayerState extends State<MediaPlayer>
     with TickerProviderStateMixin {
   // late GifController gifController;
+
   bool isGifPlaying = true;
   final File EMPTY_FILE = File('');
   late File file;
@@ -71,6 +72,7 @@ class _MediaPlayerState extends State<MediaPlayer>
     setState(() {
       file = f ?? file;
     });
+
     isGifPlaying = true;
     try {
       if (Util.isVideo(file.path)) {
@@ -86,6 +88,7 @@ class _MediaPlayerState extends State<MediaPlayer>
   void initState() {
     super.initState();
     // gifController = GifController(vsync: this);
+
     resetFile();
     player.positionStream.listen((PositionState state) {
       if (state.duration!.inMilliseconds == 0) {
@@ -159,6 +162,7 @@ class _MediaPlayerState extends State<MediaPlayer>
     shouldAutoOpen = true;
 
     return widget;
+
   }
 
   @override

@@ -60,6 +60,7 @@ class Util {
     List exts = List.of(<String>['.jpg', '.jpeg', '.png']);
     // TODO add gif frames viewer and rm this add statement
     exts.add('.gif');
+
     return exts.contains(Path.extension(filename.toLowerCase()));
   }
 
