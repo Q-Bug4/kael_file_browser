@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/movement.dart';
+import 'package:kael_file_browser/side_fileinfo.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:dart_vlc/dart_vlc.dart';
@@ -86,10 +87,17 @@ class _HomePageState extends State<HomePage> {
           .map((e) => File(e.path))
           .toList();
       itemIdx = 0;
+      items.sort((a, b) => b.lengthSync() - a.lengthSync());
       if (items.isNotEmpty) {
-        mediaPlayer.play(items[itemIdx]);
+        playCurrentFile();
       }
       movements.clear();
+    });
+  }
+
+  void playCurrentFile() {
+    setState(() {
+      mediaPlayer.play(items[itemIdx]);
     });
   }
 
@@ -121,7 +129,7 @@ class _HomePageState extends State<HomePage> {
     }
     items.add(File(movement.src));
     itemIdx = items.length - 1;
-    mediaPlayer.play(items[itemIdx]);
+    playCurrentFile();
   }
 
   void removeItemOffList() {
@@ -131,7 +139,7 @@ class _HomePageState extends State<HomePage> {
     items.removeAt(itemIdx);
     if (items.isNotEmpty) {
       itemIdx %= items.length;
-      mediaPlayer.play(items[itemIdx]);
+      playCurrentFile();
     } else {
       mediaPlayer.resetFile();
     }
@@ -152,7 +160,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: mediaPlayer,
+      body: Row(
+        children: [
+          Expanded(
+            child: mediaPlayer,
+          ),
+          SideFileinfo(),
+        ],
+      ),
       bottomNavigationBar: ButtonBar(
         children: generateBtns(),
       ),
@@ -169,6 +184,11 @@ class _HomePageState extends State<HomePage> {
         .toList();
 
     btns.addAll(List<ElevatedButton>.of(<ElevatedButton>[
+      ElevatedButton(
+          onPressed: () {
+            undoMovement();
+          },
+          child: const Text("Undo")),
       ElevatedButton(
           onPressed: () async {
             String jsonStr = "";
@@ -204,11 +224,6 @@ class _HomePageState extends State<HomePage> {
           },
           child: const Text("Edit movement")),
       ElevatedButton(
-          onPressed: () {
-            undoMovement();
-          },
-          child: const Text("Undo")),
-      ElevatedButton(
           onPressed: () async {
             String folder = await FilesystemPicker.open(
                   title: 'Open folder',
@@ -230,13 +245,13 @@ class _HomePageState extends State<HomePage> {
       ElevatedButton(
           onPressed: () {
             addIdx(-1);
-            mediaPlayer.play(items[itemIdx]);
+            playCurrentFile();
           },
           child: const Text("Last")),
       ElevatedButton(
           onPressed: () {
             addIdx(1);
-            mediaPlayer.play(items[itemIdx]);
+            playCurrentFile();
           },
           child: const Text("Next")),
       ElevatedButton(

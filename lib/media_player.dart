@@ -31,7 +31,8 @@ class MediaPlayer extends StatefulWidget {
 
 class _MediaPlayerState extends State<MediaPlayer>
     with TickerProviderStateMixin {
-  late GifController gifController;
+  // late GifController gifController;
+
   bool isGifPlaying = true;
   final File EMPTY_FILE = File('');
   late File file;
@@ -52,9 +53,9 @@ class _MediaPlayerState extends State<MediaPlayer>
     }
     if (Util.isGif(file.path)) {
       if (isGifPlaying) {
-        gifController.value = gifController.value;
+        // gifController.value = gifController.value;
       } else {
-        gifController.forward();
+        // gifController.forward();
       }
       isGifPlaying = !isGifPlaying;
     } else if (Util.isVideo(file.path)) {
@@ -71,7 +72,7 @@ class _MediaPlayerState extends State<MediaPlayer>
     setState(() {
       file = f ?? file;
     });
-    // gifController = GifController(vsync: this);
+
     isGifPlaying = true;
     try {
       if (Util.isVideo(file.path)) {
@@ -86,7 +87,8 @@ class _MediaPlayerState extends State<MediaPlayer>
   @override
   void initState() {
     super.initState();
-    gifController = GifController(vsync: this);
+    // gifController = GifController(vsync: this);
+
     resetFile();
     player.positionStream.listen((PositionState state) {
       if (state.duration!.inMilliseconds == 0) {
@@ -108,23 +110,23 @@ class _MediaPlayerState extends State<MediaPlayer>
       widget = Column(children: [
         Expanded(
           child: Gif(
-              controller: gifController,
+              // controller: gifController,
               autostart: Autostart.once,
               image: FileImage(file)),
         ),
-        Container(
-            height: 40,
-            child: AnimatedBuilder(
-              animation: gifController,
-              builder: (context, child) {
-                return Slider(
-                    value: gifController.value.toDouble(),
-                    onChanged: (position) {
-                      gifController.value = position;
-                      isGifPlaying = false;
-                    });
-              },
-            ))
+        // Container(
+        //     height: 40,
+        //     child: AnimatedBuilder(
+        //       animation: gifController,
+        //       builder: (context, child) {
+        //         return Slider(
+        //             value: gifController.value.toDouble(),
+        //             onChanged: (position) {
+        //               gifController.value = position;
+        //               isGifPlaying = false;
+        //             });
+        //       },
+        //     ))
       ]);
     } else if (Util.isVideo(file.path)) {
       widget = Column(children: [
@@ -160,5 +162,12 @@ class _MediaPlayerState extends State<MediaPlayer>
     shouldAutoOpen = true;
 
     return widget;
+
+  }
+
+  @override
+  void dispose() {
+    // gifController.dispose();
+    super.dispose();
   }
 }
