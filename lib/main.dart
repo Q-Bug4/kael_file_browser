@@ -86,6 +86,7 @@ class _HomePageState extends State<HomePage> {
           .map((e) => File(e.path))
           .toList();
       itemIdx = 0;
+      items.sort((a, b) => b.lengthSync() - a.lengthSync());
       if (items.isNotEmpty) {
         playCurrentFile();
       }
@@ -176,6 +177,11 @@ class _HomePageState extends State<HomePage> {
 
     btns.addAll(List<ElevatedButton>.of(<ElevatedButton>[
       ElevatedButton(
+          onPressed: () {
+            undoMovement();
+          },
+          child: const Text("Undo")),
+      ElevatedButton(
           onPressed: () async {
             String jsonStr = "";
             showDialog(
@@ -209,11 +215,6 @@ class _HomePageState extends State<HomePage> {
                     ));
           },
           child: const Text("Edit movement")),
-      ElevatedButton(
-          onPressed: () {
-            undoMovement();
-          },
-          child: const Text("Undo")),
       ElevatedButton(
           onPressed: () async {
             String folder = await FilesystemPicker.open(
