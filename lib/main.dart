@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/movement.dart';
@@ -157,6 +158,12 @@ class _HomePageState extends State<HomePage> {
     itemIdx %= items.length;
   }
 
+  void setIdx(int idx) {
+    setState(() {
+      itemIdx = max(0, idx) % items.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -165,7 +172,15 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: mediaPlayer,
           ),
-          SideFileinfo(),
+          SideFileinfo(
+            files: items,
+            changeIdx: (idx) => {
+              setState(() {
+                setIdx(idx);
+                playCurrentFile();
+              })
+            },
+          ),
         ],
       ),
       bottomNavigationBar: ButtonBar(
