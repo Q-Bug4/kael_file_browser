@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:kael_file_browser/util.dart';
 import 'package:path/path.dart' as Path;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -52,25 +53,47 @@ class _SideFileinfoState extends State<SideFileinfo> {
       ));
     }
 
-    return Container(
+    Widget content = Column(children: [
+      Expanded(
+          child: ListView(
+        children: expanded ? btns : List.empty(),
+      )),
+      Container(
+          height: 100,
+          child: expanded
+              ? Column(children: [
+                  Expanded(
+                      child: ListView(
+                    children: [
+                      Text(
+                        "Uri: ${widget.files[idx].path}",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.indigo),
+                      ),
+                      Text(
+                        "Size: ${Util.getReadableFileSize(widget.files[idx].lengthSync())}",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.teal),
+                      )
+                    ],
+                  )),
+                  Text("$idx/${files.length}"),
+                ])
+              : Column()),
+      Container(
+        height: 40,
         width: width,
-        child: Column(children: [
-          Expanded(
-              child: ListView(
-            children: expanded ? btns : List.empty(),
-          )),
-          Container(
-            height: 40,
-            width: width,
-            child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    expanded = !expanded;
-                    width = expanded ? EXPAND_WIDTH : COLL_WIDTH;
-                  });
-                },
-                icon: expanded ? rightArrow : leftArrow),
-          )
-        ]));
+        child: IconButton(
+            onPressed: () {
+              setState(() {
+                expanded = !expanded;
+                width = expanded ? EXPAND_WIDTH : COLL_WIDTH;
+              });
+            },
+            icon: expanded ? rightArrow : leftArrow),
+      )
+    ]);
+
+    return Container(width: width, child: content);
   }
 }

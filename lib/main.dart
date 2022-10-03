@@ -75,6 +75,9 @@ class _HomePageState extends State<HomePage> {
   MediaPlayer mediaPlayer = MediaPlayer();
 
   void openFolder(String path) {
+    if (path == this.path) {
+      return;
+    }
     Directory.current = Directory(path);
     local!['path'] = path;
     setLocal(local!);
@@ -252,8 +255,8 @@ class _HomePageState extends State<HomePage> {
                 ) ??
                 path;
             setState(() {
+              openFolder(folder);
               path = folder;
-              openFolder(path);
             });
           },
           child: const Text("Open folder")),
