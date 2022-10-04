@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
   MediaPlayer mediaPlayer = MediaPlayer();
 
   void openFolder(String path) {
-    if (path == this.path) {
+    if (items.isNotEmpty && path == this.path) {
       return;
     }
     Directory.current = Directory(path);

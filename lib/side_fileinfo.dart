@@ -77,7 +77,7 @@ class _SideFileinfoState extends State<SideFileinfo> {
                       )
                     ],
                   )),
-                  Text("$idx/${files.length}"),
+                  Text("${1 + idx}/${files.length}"),
                 ])
               : Column()),
       Container(
