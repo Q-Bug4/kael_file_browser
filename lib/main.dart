@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/movement.dart';
@@ -74,6 +75,9 @@ class _HomePageState extends State<HomePage> {
   MediaPlayer mediaPlayer = MediaPlayer();
 
   void openFolder(String path) {
+    if (path == this.path) {
+      return;
+    }
     Directory.current = Directory(path);
     local!['path'] = path;
     setLocal(local!);
@@ -157,6 +161,12 @@ class _HomePageState extends State<HomePage> {
     itemIdx %= items.length;
   }
 
+  void setIdx(int idx) {
+    setState(() {
+      itemIdx = max(0, idx) % items.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -165,7 +175,15 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: mediaPlayer,
           ),
-          SideFileinfo(),
+          SideFileinfo(
+            files: items,
+            changeIdx: (idx) => {
+              setState(() {
+                setIdx(idx);
+                playCurrentFile();
+              })
+            },
+          ),
         ],
       ),
       bottomNavigationBar: ButtonBar(
@@ -237,8 +255,8 @@ class _HomePageState extends State<HomePage> {
                 ) ??
                 path;
             setState(() {
+              openFolder(folder);
               path = folder;
-              openFolder(path);
             });
           },
           child: const Text("Open folder")),

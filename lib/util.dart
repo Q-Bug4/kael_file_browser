@@ -89,4 +89,17 @@ class Util {
       },
     );
   }
+
+  static String getReadableFileSize(int bytes) {
+    List<String> units = List.of(<String>["B", "KB", "MB", "GB"]);
+    final double STEP_CNT = 1024;
+    int unitIdx = 0;
+    double result = bytes.toDouble();
+    while (result >= STEP_CNT) {
+      result /= STEP_CNT;
+      unitIdx++;
+    }
+    return result.toStringAsFixed(result.truncateToDouble() == result ? 0 : 2) +
+        units[unitIdx];
+  }
 }
