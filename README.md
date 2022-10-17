@@ -15,6 +15,7 @@ For now, just tested this app on Linux.
 - [x] Video position controll bar
 - [x] Remember last open folder
 - [x] Only show control bar when playing videos or gifs
+- [x] File sorting
 - [ ] Gif control 
 - [ ] Shortcut
 - [ ] Custom Shortcut
