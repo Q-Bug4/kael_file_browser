@@ -21,11 +21,29 @@ class _SideFileinfoState extends State<SideFileinfo> {
   late List<File> files;
   late double width;
   bool expanded = false;
+  String sortValue = "Name";
+  bool sortDesc = true;
   int idx = 0;
   final double EXPAND_WIDTH = 300;
   final double COLL_WIDTH = 30;
   final Icon leftArrow = const Icon(Icons.keyboard_arrow_left);
   final Icon rightArrow = const Icon(Icons.keyboard_arrow_right);
+
+  void sort() {
+    switch (sortValue) {
+      case "Size":
+        widget.files.sort(
+            (a, b) => (sortDesc ? 1 : -1) * (b.lengthSync() - a.lengthSync()));
+        break;
+      case "Name":
+        widget.files
+            .sort((a, b) => (sortDesc ? 1 : -1) * b.path.compareTo(a.path));
+
+        break;
+      default:
+    }
+    widget.changeIdx(0);
+  }
 
   @override
   void initState() {
@@ -70,14 +88,53 @@ class _SideFileinfoState extends State<SideFileinfo> {
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.indigo),
                       ),
-                      Text(
-                        "Size: ${Util.getReadableFileSize(widget.files[idx].lengthSync())}",
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.teal),
+                      Row(
+                        children: [
+                          Text(
+                            "  Size: ${Util.getReadableFileSize(widget.files[idx].lengthSync())}",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.teal),
+                          ),
+                          Spacer(),
+                          Text("${1 + idx}/${files.length}  "),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text("sort"),
+                          Radio(
+                              value: "Name",
+                              groupValue: sortValue,
+                              onChanged: (v) {
+                                setState(() {
+                                  sortValue = v.toString();
+                                  sort();
+                                });
+                              }),
+                          Text("Name"),
+                          Radio(
+                              value: "Size",
+                              groupValue: sortValue,
+                              onChanged: (v) {
+                                setState(() {
+                                  sortValue = v.toString();
+                                  sort();
+                                });
+                              }),
+                          Text("Size"),
+                          Checkbox(
+                              value: sortDesc,
+                              onChanged: (v) {
+                                setState(() {
+                                  sortDesc = !sortDesc;
+                                  sort();
+                                });
+                              }),
+                          Text("Reverse"),
+                        ],
                       )
                     ],
                   )),
-                  Text("$idx/${files.length}"),
                 ])
               : Column()),
       Container(
