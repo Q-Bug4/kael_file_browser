@@ -75,6 +75,7 @@ class _HomePageState extends State<HomePage> {
   MediaPlayer mediaPlayer = MediaPlayer();
 
   void openFolder(String path) {
+    // path = "D:\\evilIdm";
     if (items.isNotEmpty && path == this.path) {
       return;
     }
@@ -112,6 +113,7 @@ class _HomePageState extends State<HomePage> {
     File file = items[itemIdx];
     Movement movement =
         Movement(src: file.path, dst: "$dst/${Path.basename(file.path)}");
+    mediaPlayer.resetFile();
     String errMsg = movement.doMove();
     if (errMsg.isNotEmpty) {
       Util.showInfoDialog(context, "Movement error", errMsg);
