@@ -27,11 +27,7 @@ setLocal(Map<String, dynamic> map) {
 
 initLocal() async {
   activate = local!['activate'];
-  String movementStr = local!['cases'][activate]
-      .toString()
-      .replaceAllMapped(RegExp(r'([/\w\.]+)'), (match) {
-    return '"${match.group(0)}"';
-  });
+  String movementStr = json.encode(local!['cases'][activate]);
   alias2dst = Map<String, dynamic>.from(jsonDecode(movementStr))
       .map((key, value) => MapEntry(key, value.toString()));
 }
