@@ -167,7 +167,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: ButtonBar(
+      bottomNavigationBar: Wrap(
         children: generateBtns(),
       ),
     );
@@ -179,7 +179,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               move(e.value);
             },
-            child: Text("[Mv] ${e.key}")))
+            child: Text(e.key)))
         .toList();
 
     btns.addAll(List<ElevatedButton>.of(<ElevatedButton>[
