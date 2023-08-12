@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:kael_file_browser/FileManager.dart';
 import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/movement.dart';
 import 'package:kael_file_browser/side_fileinfo.dart';
@@ -64,22 +65,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<File> items = List<File>.empty();
-  int itemIdx = 0;
+  FileManager fileManager = FileManager(List<File>.empty());
   List<Movement> movements = List.empty(growable: true);
   String path = local?['path'] ?? "/home/kael/tmp/";
   MediaPlayer mediaPlayer = MediaPlayer();
 
   void openFolder(String path) {
     // path = "D:\\evilIdm";
-    if (items.isNotEmpty && path == this.path) {
+    if (fileManager.isNotEmpty() && path == this.path) {
       return;
     }
     Directory.current = Directory(path);
     local!['path'] = path;
     setLocal(local!);
     setState(() {
-      items = Directory(path)
+      List<File> files = Directory(path)
           .listSync()
           .where((p) =>
               Util.isGif(p.path) ||
@@ -87,9 +87,9 @@ class _HomePageState extends State<HomePage> {
               Util.isVideo(p.path))
           .map((e) => File(e.path))
           .toList();
-      itemIdx = 0;
+      fileManager.setFiles(files);
       // items.sort((a, b) => b.lengthSync() - a.lengthSync());
-      if (items.isNotEmpty) {
+      if (fileManager.isNotEmpty()) {
         playCurrentFile();
       }
       movements.clear();
@@ -98,15 +98,18 @@ class _HomePageState extends State<HomePage> {
 
   void playCurrentFile() {
     setState(() {
-      mediaPlayer.play(items[itemIdx]);
+      File? file = fileManager.getCurrentFile();
+      if (file != null) {
+        mediaPlayer.play(file);
+      }
     });
   }
 
   void move(String dst) {
-    if (items.isEmpty) {
+    if (fileManager.isEmpty()) {
       return;
     }
-    File file = items[itemIdx];
+    File file = fileManager.getCurrentFile()!;
     Movement movement =
         Movement(src: file.path, dst: "$dst/${Path.basename(file.path)}");
     mediaPlayer.resetFile();
@@ -129,40 +132,20 @@ class _HomePageState extends State<HomePage> {
       Util.showInfoDialog(context, "Movement error", errMsg);
       return;
     }
-    items.add(File(movement.src));
-    itemIdx = items.length - 1;
+    fileManager.addFileBeforeCur(File(movement.src));
     playCurrentFile();
   }
 
   void removeItemOffList() {
-    if (items.isEmpty) {
+    if (fileManager.isEmpty()) {
       return;
     }
-    items.removeAt(itemIdx);
-    if (items.isNotEmpty) {
-      itemIdx %= items.length;
+    fileManager.removeCurFile();
+    if (fileManager.isNotEmpty()) {
       playCurrentFile();
     } else {
       mediaPlayer.resetFile();
     }
-  }
-
-  void addIdx(int addtion) {
-    if (items.isEmpty) {
-      itemIdx = 0;
-      return;
-    }
-    itemIdx += addtion;
-    while (itemIdx < 0) {
-      itemIdx += items.length;
-    }
-    itemIdx %= items.length;
-  }
-
-  void setIdx(int idx) {
-    setState(() {
-      itemIdx = max(0, idx) % items.length;
-    });
   }
 
   @override
@@ -174,10 +157,10 @@ class _HomePageState extends State<HomePage> {
             child: mediaPlayer,
           ),
           SideFileinfo(
-            files: items,
+            files: fileManager.getAllFile(),
             changeIdx: (idx) => {
               setState(() {
-                setIdx(idx);
+                fileManager.setFileAt(idx);
                 playCurrentFile();
               })
             },
@@ -260,13 +243,13 @@ class _HomePageState extends State<HomePage> {
           child: const Text("Open folder")),
       ElevatedButton(
           onPressed: () {
-            addIdx(-1);
+            fileManager.lastFile();
             playCurrentFile();
           },
           child: const Text("Last")),
       ElevatedButton(
           onPressed: () {
-            addIdx(1);
+            fileManager.nextFile();
             playCurrentFile();
           },
           child: const Text("Next")),
