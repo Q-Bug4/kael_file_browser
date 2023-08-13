@@ -144,17 +144,23 @@ class _MediaPlayerState extends State<MediaPlayer>
         ),
         Container(
             height: 40,
-            child: Slider(
-                min: 0,
-                max: position.duration!.inMilliseconds.toDouble(),
-                value: position.position!.inMilliseconds.toDouble(),
-                onChanged: (position) {
-                  player.seek(
-                    Duration(
-                      milliseconds: position.toInt(),
-                    ),
-                  );
-                }))
+            child: Row(
+              children: [
+                Text(formatDuration(player.position.position)),
+                Expanded(child: Slider(
+                    min: 0,
+                    max: position.duration!.inMilliseconds.toDouble(),
+                    value: position.position!.inMilliseconds.toDouble(),
+                    onChanged: (position) {
+                      player.seek(
+                        Duration(
+                          milliseconds: position.toInt(),
+                        ),
+                      );
+                    })),
+                Text(formatDuration(player.position.duration)),
+              ],
+            ))
       ]);
     } else {
       return const Text("Please pick a folder");
@@ -173,5 +179,17 @@ class _MediaPlayerState extends State<MediaPlayer>
   void dispose() {
     // gifController.dispose();
     super.dispose();
+  }
+
+  String formatDuration(Duration? duration) {
+    if (duration == null) {
+      return "00:00:00";
+    }
+    int seconds = duration.inSeconds;
+    int minutes = seconds ~/ 60;
+    int hours = minutes ~/ 60;
+    return "${hours.toString().padLeft(2, '0')}"
+        ":${(minutes % 60).toString().padLeft(2, '0')}"
+        ":${(seconds % 60).toString().padLeft(2, '0')}";
   }
 }
