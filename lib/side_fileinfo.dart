@@ -23,7 +23,7 @@ class SideFileInfo extends StatefulWidget {
 class _SideFileInfoState extends State<SideFileInfo> {
   late List<File> files;
   late double width;
-  bool expanded = false;
+  bool expanded = true;
   String sortValue = "Name";
   bool sortDesc = true;
   int idx = 0;
@@ -50,7 +50,7 @@ class _SideFileInfoState extends State<SideFileInfo> {
 
   @override
   void initState() {
-    width = COLL_WIDTH;
+    width = expanded ? EXPAND_WIDTH : COLL_WIDTH;
     super.initState();
   }
 
