@@ -1,23 +1,22 @@
 import 'dart:io';
-import 'dart:math';
 import 'package:kael_file_browser/util.dart';
 import 'package:path/path.dart' as Path;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:sidebarx/sidebarx.dart';
 
-class SideFileinfo extends StatefulWidget {
+class SideFileInfo extends StatefulWidget {
   List<File> files;
+  List<ElevatedButton> btns;
   Function changeIdx;
 
-  SideFileinfo({Key? key, required this.files, required this.changeIdx})
-      : super(key: key);
+  SideFileInfo({Key? key, required this.files, required this.changeIdx,
+    required this.btns}) : super(key: key);
 
   @override
-  State<SideFileinfo> createState() => _SideFileinfoState();
+  State<SideFileInfo> createState() => _SideFileInfoState();
 }
 
-class _SideFileinfoState extends State<SideFileinfo> {
+class _SideFileInfoState extends State<SideFileInfo> {
   late List<File> files;
   late double width;
   bool expanded = false;
@@ -55,12 +54,12 @@ class _SideFileinfoState extends State<SideFileinfo> {
   Widget build(BuildContext context) {
     List<String> files =
         widget.files.map((e) => Path.basename(e.path)).toList();
-    List<TextButton> btns = List.empty(growable: true);
+    List<TextButton> fileBtns = List.empty(growable: true);
     for (int i = 0; i < files.length; i++) {
       final TextStyle style = i == idx
           ? const TextStyle(color: Colors.blue)
           : const TextStyle(color: Colors.black);
-      btns.add(TextButton(
+      fileBtns.add(TextButton(
         onPressed: () {
           setState(() {
             idx = i;
@@ -74,7 +73,7 @@ class _SideFileinfoState extends State<SideFileinfo> {
     Widget content = Column(children: [
       Expanded(
           child: ListView(
-        children: expanded ? btns : List.empty(),
+        children: expanded ? fileBtns : List.empty(),
       )),
       Container(
           height: 100,
@@ -137,6 +136,11 @@ class _SideFileinfoState extends State<SideFileinfo> {
                   )),
                 ])
               : Column()),
+      Container(
+        child: expanded
+            ? Wrap(children: widget.btns,)
+            : const Wrap(),
+      ),
       Container(
         height: 40,
         width: width,

@@ -156,8 +156,85 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: mediaPlayer,
           ),
-          SideFileinfo(
+          SideFileInfo(
             files: fileManager.getAllFile(),
+            btns: List<ElevatedButton>.of(<ElevatedButton>[
+              ElevatedButton(
+                  onPressed: () {
+                    undoMovement();
+                  },
+                  child: const Text("Undo")),
+              ElevatedButton(
+                  onPressed: () async {
+                    String jsonStr = "";
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Edit your movement"),
+                          content: JsonEditor.object(
+                            object: local,
+                            onValueChanged: (val) {
+                              jsonStr = val.toString();
+                            },
+                          ),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  setLocal(json.decode(jsonStr));
+                                  local = Map<String, dynamic>.from(
+                                      jsonDecode(jsonStr));
+                                  setState(() {
+                                    initLocal();
+                                  });
+                                },
+                                child: const Text("OK")),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text("Cancel"))
+                          ],
+                        ));
+                  },
+                  child: const Text("Edit movement")),
+              ElevatedButton(
+                  onPressed: () async {
+                    String folder = await FilesystemPicker.open(
+                      title: 'Open folder',
+                      context: context,
+                      rootDirectory: Directory("/"),
+                      directory: path.isNotEmpty
+                          ? Directory(path)
+                          : Directory(Util.getUserDirectory()),
+                      fsType: FilesystemType.folder,
+                      pickText: 'Pick folder',
+                    ) ??
+                        path;
+                    setState(() {
+                      openFolder(folder);
+                      path = folder;
+                    });
+                  },
+                  child: const Text("Open folder")),
+              ElevatedButton(
+                  onPressed: () {
+                    fileManager.lastFile();
+                    playCurrentFile();
+                  },
+                  child: const Text("Last")),
+              ElevatedButton(
+                  onPressed: () {
+                    fileManager.nextFile();
+                    playCurrentFile();
+                  },
+                  child: const Text("Next")),
+              ElevatedButton(
+                  onPressed: () {
+                    mediaPlayer.playOrPause();
+                  },
+                  child: const Text("Play/Pause")),
+            ]),
             changeIdx: (idx) => {
               setState(() {
                 fileManager.setFileAt(idx);
@@ -174,91 +251,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<ElevatedButton> generateBtns() {
-    List<ElevatedButton> btns = alias2dst.entries
+    return alias2dst.entries
         .map((e) => ElevatedButton(
             onPressed: () {
               move(e.value);
             },
             child: Text(e.key)))
         .toList();
-
-    btns.addAll(List<ElevatedButton>.of(<ElevatedButton>[
-      ElevatedButton(
-          onPressed: () {
-            undoMovement();
-          },
-          child: const Text("Undo")),
-      ElevatedButton(
-          onPressed: () async {
-            String jsonStr = "";
-            showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                      title: const Text("Edit your movement"),
-                      content: JsonEditor.object(
-                        object: local,
-                        onValueChanged: (val) {
-                          jsonStr = val.toString();
-                        },
-                      ),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              setLocal(json.decode(jsonStr));
-                              local = Map<String, dynamic>.from(
-                                  jsonDecode(jsonStr));
-                              setState(() {
-                                initLocal();
-                              });
-                            },
-                            child: const Text("OK")),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Cancel"))
-                      ],
-                    ));
-          },
-          child: const Text("Edit movement")),
-      ElevatedButton(
-          onPressed: () async {
-            String folder = await FilesystemPicker.open(
-                  title: 'Open folder',
-                  context: context,
-                  rootDirectory: Directory("/"),
-                  directory: path.isNotEmpty
-                      ? Directory(path)
-                      : Directory(Util.getUserDirectory()),
-                  fsType: FilesystemType.folder,
-                  pickText: 'Pick folder',
-                ) ??
-                path;
-            setState(() {
-              openFolder(folder);
-              path = folder;
-            });
-          },
-          child: const Text("Open folder")),
-      ElevatedButton(
-          onPressed: () {
-            fileManager.lastFile();
-            playCurrentFile();
-          },
-          child: const Text("Last")),
-      ElevatedButton(
-          onPressed: () {
-            fileManager.nextFile();
-            playCurrentFile();
-          },
-          child: const Text("Next")),
-      ElevatedButton(
-          onPressed: () {
-            mediaPlayer.playOrPause();
-          },
-          child: const Text("Play/Pause")),
-    ]));
-    return btns;
   }
 }
