@@ -197,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ));
                   },
-                  child: const Text("Edit movement")),
+                  child: const Text("Move conf")),
               ElevatedButton(
                   onPressed: () async {
                     String folder = await FilesystemPicker.open(
