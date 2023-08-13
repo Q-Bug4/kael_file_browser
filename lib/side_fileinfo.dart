@@ -9,8 +9,12 @@ class SideFileInfo extends StatefulWidget {
   List<ElevatedButton> btns;
   Function changeIdx;
 
-  SideFileInfo({Key? key, required this.files, required this.changeIdx,
-    required this.btns}) : super(key: key);
+  SideFileInfo(
+      {Key? key,
+      required this.files,
+      required this.changeIdx,
+      required this.btns})
+      : super(key: key);
 
   @override
   State<SideFileInfo> createState() => _SideFileInfoState();
@@ -77,7 +81,7 @@ class _SideFileInfoState extends State<SideFileInfo> {
       )),
       Container(
           height: 100,
-          child: expanded
+          child: expanded && widget.files.isNotEmpty
               ? Column(children: [
                   Expanded(
                       child: ListView(
@@ -138,7 +142,9 @@ class _SideFileInfoState extends State<SideFileInfo> {
               : Column()),
       Container(
         child: expanded
-            ? Wrap(children: widget.btns,)
+            ? Wrap(
+                children: widget.btns,
+              )
             : const Wrap(),
       ),
       Container(
