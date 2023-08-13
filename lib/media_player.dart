@@ -131,10 +131,15 @@ class _MediaPlayerState extends State<MediaPlayer>
     } else if (Util.isVideo(file.path)) {
       widget = Column(children: [
         Expanded(
-          child: Video(
-            player: player,
-            scale: 1.0, // default
-            showControls: false,
+          child: GestureDetector(
+            onTap: () {
+              playOrPause();
+            },
+            child: Video(
+              player: player,
+              scale: 1.0, // default
+              showControls: false,
+            ),
           ),
         ),
         Container(
@@ -162,7 +167,6 @@ class _MediaPlayerState extends State<MediaPlayer>
     shouldAutoOpen = true;
 
     return widget;
-
   }
 
   @override

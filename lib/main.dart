@@ -229,11 +229,6 @@ class _HomePageState extends State<HomePage> {
                     playCurrentFile();
                   },
                   child: const Text("Next")),
-              ElevatedButton(
-                  onPressed: () {
-                    mediaPlayer.playOrPause();
-                  },
-                  child: const Text("Play/Pause")),
             ]),
             changeIdx: (idx) => {
               setState(() {
