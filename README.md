@@ -16,6 +16,11 @@ For now, just tested this app on Linux.
 - [x] Remember last open folder
 - [x] Only show control bar when playing videos or gifs
 - [x] File sorting
+- [x] Multi lines for custom buttons
+- [x] Move control button into sidebar
+- [x] Click media player to play/pause instead of clicking button
+- [x] Cur time at left; end time at right
+- [ ] Refactor code - continuous
 - [ ] Gif control 
 - [ ] Shortcut
 - [ ] Custom Shortcut
@@ -24,5 +29,6 @@ For now, just tested this app on Linux.
 ## Bugs
 - [x] Controll bar position overflow
 - [x] Set play blank after move the lastest file
+- [ ] init local movement
 - [ ] Can not open files whose filename contains `#`
 - [ ] (In process) Broken file cause crash
