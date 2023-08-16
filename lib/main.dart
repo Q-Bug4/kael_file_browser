@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kael_file_browser/FileManager.dart';
 import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/movement.dart';
@@ -37,9 +37,12 @@ void main() async {
   await DartVLC.initialize(useFlutterNativeView: true);
   WidgetsFlutterBinding.ensureInitialized();
   local = await db.collection("custom_movement").doc("kael_file_browser").get();
-  if (local != null) {
-    await initLocal();
+
+  if (local == null) {
+    var jsonStr = await rootBundle.loadString('assets/emptyMovement.json');
+    setLocal(json.decode(jsonStr));
   }
+  await initLocal();
   runApp(const MyApp());
 }
 
