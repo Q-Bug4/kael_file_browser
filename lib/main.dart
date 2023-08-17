@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:kael_file_browser/FileManager.dart';
+import 'package:kael_file_browser/MovementManager.dart';
 import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/movement.dart';
 import 'package:kael_file_browser/side_fileinfo.dart';
@@ -10,39 +10,14 @@ import 'package:kael_file_browser/util.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:path/path.dart' as Path;
-import 'package:localstore/localstore.dart';
 import 'package:json_editor/json_editor.dart';
 
-final db = Localstore.instance;
-Map<String, String> alias2dst = Map();
-String activate = "";
-late Map<String, dynamic>? local;
-
-setLocal(Map<String, dynamic> map) {
-  db
-      .collection("custom_movement")
-      .doc("kael_file_browser")
-      .set(map)
-      .then((value) => {});
-}
-
-initMovement() async {
-  activate = local!['activate'];
-  String movementStr = json.encode(local!['cases'][activate]);
-  alias2dst = Map<String, dynamic>.from(jsonDecode(movementStr))
-      .map((key, value) => MapEntry(key, value.toString()));
-}
+MovementManager movementManager = MovementManager(collectionName: "custom_movement", docName: "kael_file_browser");
 
 void main() async {
   await DartVLC.initialize(useFlutterNativeView: true);
   WidgetsFlutterBinding.ensureInitialized();
-  local = await db.collection("custom_movement").doc("kael_file_browser").get();
-
-  if (local == null) {
-    var jsonStr = await rootBundle.loadString('assets/emptyMovement.json');
-    setLocal(json.decode(jsonStr));
-  }
-  await initMovement();
+  movementManager.init();
   runApp(const MyApp());
 }
 
@@ -70,17 +45,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   FileManager fileManager = FileManager(List<File>.empty());
   List<Movement> movements = List.empty(growable: true);
-  String path = local?['path'] ?? "/home/kael/tmp/";
   MediaPlayer mediaPlayer = MediaPlayer();
 
   void openFolder(String path) {
-    // path = "D:\\evilIdm";
-    if (fileManager.isNotEmpty() && path == this.path) {
+    if (fileManager.isNotEmpty() && path == movementManager.getPath()) {
       return;
     }
     Directory.current = Directory(path);
-    local!['path'] = path;
-    setLocal(local!);
+    movementManager.setPath(path);
     setState(() {
       List<File> files = Directory(path)
           .listSync()
@@ -175,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => AlertDialog(
                           title: const Text("Edit your movement"),
                           content: JsonEditor.object(
-                            object: local,
+                            object: movementManager.getLocal(),
                             onValueChanged: (val) {
                               jsonStr = val.toString();
                             },
@@ -184,11 +156,8 @@ class _HomePageState extends State<HomePage> {
                             TextButton(
                                 onPressed: () {
                                   Navigator.of(context).pop();
-                                  setLocal(json.decode(jsonStr));
-                                  local = Map<String, dynamic>.from(
-                                      jsonDecode(jsonStr));
                                   setState(() {
-                                    initMovement();
+                                    movementManager.setLocal(jsonDecode(jsonStr));
                                   });
                                 },
                                 child: const Text("OK")),
@@ -207,16 +176,16 @@ class _HomePageState extends State<HomePage> {
                       title: 'Open folder',
                       context: context,
                       rootDirectory: Directory("/"),
-                      directory: path.isNotEmpty
-                          ? Directory(path)
+                      directory: movementManager.getPath().isNotEmpty
+                          ? Directory(movementManager.getPath())
                           : Directory(Util.getUserDirectory()),
                       fsType: FilesystemType.folder,
                       pickText: 'Pick folder',
                     ) ??
-                        path;
+                        movementManager.getPath();
                     setState(() {
                       openFolder(folder);
-                      path = folder;
+                      movementManager.setPath(folder);
                     });
                   },
                   child: const Text("Open folder")),
@@ -249,7 +218,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<ElevatedButton> generateBtns() {
-    return alias2dst.entries
+    return movementManager.getAlias().entries
         .map((e) => ElevatedButton(
             onPressed: () {
               move(e.value);
