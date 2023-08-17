@@ -26,7 +26,7 @@ setLocal(Map<String, dynamic> map) {
       .then((value) => {});
 }
 
-initLocal() async {
+initMovement() async {
   activate = local!['activate'];
   String movementStr = json.encode(local!['cases'][activate]);
   alias2dst = Map<String, dynamic>.from(jsonDecode(movementStr))
@@ -42,7 +42,7 @@ void main() async {
     var jsonStr = await rootBundle.loadString('assets/emptyMovement.json');
     setLocal(json.decode(jsonStr));
   }
-  await initLocal();
+  await initMovement();
   runApp(const MyApp());
 }
 
@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                                   local = Map<String, dynamic>.from(
                                       jsonDecode(jsonStr));
                                   setState(() {
-                                    initLocal();
+                                    initMovement();
                                   });
                                 },
                                 child: const Text("OK")),
