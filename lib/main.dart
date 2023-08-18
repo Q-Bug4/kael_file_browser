@@ -12,12 +12,9 @@ import 'package:dart_vlc/dart_vlc.dart';
 import 'package:path/path.dart' as Path;
 import 'package:json_editor/json_editor.dart';
 
-MovementManager movementManager = MovementManager(collectionName: "custom_movement", docName: "kael_file_browser");
-
 void main() async {
   await DartVLC.initialize(useFlutterNativeView: true);
   WidgetsFlutterBinding.ensureInitialized();
-  movementManager.init();
   runApp(const MyApp());
 }
 
@@ -46,6 +43,7 @@ class _HomePageState extends State<HomePage> {
   FileManager fileManager = FileManager(List<File>.empty());
   List<Movement> movements = List.empty(growable: true);
   MediaPlayer mediaPlayer = MediaPlayer();
+  MovementManager movementManager = MovementManager(collectionName: "custom_movement", docName: "kael_file_browser");
 
   void openFolder(String path) {
     if (fileManager.isNotEmpty() && path == movementManager.getPath()) {
@@ -211,8 +209,16 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: Wrap(
-        children: generateBtns(),
+      bottomNavigationBar: FutureBuilder(
+        future: movementManager.init(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return Wrap(
+              children: generateBtns(),
+            );
+          }
+          return const Wrap(children: [],);
+        },
       ),
     );
   }
