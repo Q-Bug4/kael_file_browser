@@ -1,10 +1,15 @@
 import 'dart:io';
 
+import 'movement.dart';
+
 class FileManager {
   FileManager(this.files);
 
   /// files to manage
   List<File> files;
+
+  /// move history
+  List<Movement> movements = List.empty(growable: true);
 
   /// current handling file's index
   int curIdx = 0;
@@ -31,6 +36,7 @@ class FileManager {
 
   void setFiles(List<File> files) {
     this.files = files;
+    movements.clear();
   }
 
   void addFileToLast(File file) {
@@ -80,5 +86,17 @@ class FileManager {
     } else {
       curIdx = 0;
     }
+  }
+
+  void addHistory(Movement history) {
+    movements.add(history);
+  }
+
+  bool isHistoryEmpty() {
+    return movements.isEmpty;
+  }
+
+  Movement popLastHistory() {
+    return movements.removeLast();
   }
 }

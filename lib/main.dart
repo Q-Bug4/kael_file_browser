@@ -41,7 +41,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   FileManager fileManager = FileManager(List<File>.empty());
-  List<Movement> movements = List.empty(growable: true);
   MediaPlayer mediaPlayer = MediaPlayer();
   ConfigManager configManager = ConfigManager(collectionName: "custom_movement", docName: "kael_file_browser");
 
@@ -65,7 +64,6 @@ class _HomePageState extends State<HomePage> {
       if (fileManager.isNotEmpty()) {
         playCurrentFile();
       }
-      movements.clear();
     });
   }
 
@@ -91,15 +89,15 @@ class _HomePageState extends State<HomePage> {
       Util.showInfoDialog(context, "Movement error", errMsg);
       return;
     }
-    movements.add(movement);
+    fileManager.addHistory(movement);
     removeItemOffList();
   }
 
   void undoMovement() {
-    if (movements.isEmpty) {
+    if (fileManager.isHistoryEmpty()) {
       return;
     }
-    Movement movement = movements.removeLast();
+    Movement movement = fileManager.popLastHistory();
     String errMsg = movement.undo();
     if (errMsg.isNotEmpty) {
       Util.showInfoDialog(context, "Movement error", errMsg);
