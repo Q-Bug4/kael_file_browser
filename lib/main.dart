@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kael_file_browser/FileManager.dart';
 import 'package:kael_file_browser/ConfigManager.dart';
 import 'package:kael_file_browser/media_player.dart';
-import 'package:kael_file_browser/movement.dart';
+import 'package:kael_file_browser/MoveHistory.dart';
 import 'package:kael_file_browser/side_fileinfo.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
@@ -81,15 +81,15 @@ class _HomePageState extends State<HomePage> {
       return;
     }
     File file = fileManager.getCurrentFile()!;
-    Movement movement =
-        Movement(src: file.path, dst: "$dst/${Path.basename(file.path)}");
+    MoveHistory moveHistory =
+        MoveHistory(src: file.path, dst: "$dst/${Path.basename(file.path)}");
     mediaPlayer.resetFile();
-    String errMsg = movement.doMove();
+    String errMsg = moveHistory.doMove();
     if (errMsg.isNotEmpty) {
       Util.showInfoDialog(context, "Movement error", errMsg);
       return;
     }
-    fileManager.addHistory(movement);
+    fileManager.addHistory(moveHistory);
     removeItemOffList();
   }
 
@@ -97,13 +97,13 @@ class _HomePageState extends State<HomePage> {
     if (fileManager.isHistoryEmpty()) {
       return;
     }
-    Movement movement = fileManager.popLastHistory();
-    String errMsg = movement.undo();
+    MoveHistory moveHistory = fileManager.popLastHistory();
+    String errMsg = moveHistory.undo();
     if (errMsg.isNotEmpty) {
       Util.showInfoDialog(context, "Movement error", errMsg);
       return;
     }
-    fileManager.addFileBeforeCur(File(movement.src));
+    fileManager.addFileBeforeCur(File(moveHistory.src));
     playCurrentFile();
   }
 

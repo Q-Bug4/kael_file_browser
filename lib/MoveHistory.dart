@@ -1,8 +1,8 @@
 import 'package:kael_file_browser/util.dart';
 
-class Movement {
+class MoveHistory {
   // TODO validate src and dst
-  Movement({
+  MoveHistory({
     required this.src,
     required this.dst,
   });
