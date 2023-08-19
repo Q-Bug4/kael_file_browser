@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kael_file_browser/FileManager.dart';
-import 'package:kael_file_browser/MovementManager.dart';
+import 'package:kael_file_browser/ConfigManager.dart';
 import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/movement.dart';
 import 'package:kael_file_browser/side_fileinfo.dart';
@@ -43,14 +43,14 @@ class _HomePageState extends State<HomePage> {
   FileManager fileManager = FileManager(List<File>.empty());
   List<Movement> movements = List.empty(growable: true);
   MediaPlayer mediaPlayer = MediaPlayer();
-  MovementManager movementManager = MovementManager(collectionName: "custom_movement", docName: "kael_file_browser");
+  ConfigManager configManager = ConfigManager(collectionName: "custom_movement", docName: "kael_file_browser");
 
   void openFolder(String path) {
-    if (fileManager.isNotEmpty() && path == movementManager.getPath()) {
+    if (fileManager.isNotEmpty() && path == configManager.getPath()) {
       return;
     }
     Directory.current = Directory(path);
-    movementManager.setPath(path);
+    configManager.setPath(path);
     setState(() {
       List<File> files = Directory(path)
           .listSync()
@@ -145,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                         builder: (context) => AlertDialog(
                           title: const Text("Edit your movement"),
                           content: JsonEditor.object(
-                            object: movementManager.getLocal(),
+                            object: configManager.getLocal(),
                             onValueChanged: (val) {
                               jsonStr = val.toString();
                             },
@@ -155,7 +155,7 @@ class _HomePageState extends State<HomePage> {
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   setState(() {
-                                    movementManager.setLocal(jsonDecode(jsonStr));
+                                    configManager.setLocal(jsonDecode(jsonStr));
                                   });
                                 },
                                 child: const Text("OK")),
@@ -174,16 +174,16 @@ class _HomePageState extends State<HomePage> {
                       title: 'Open folder',
                       context: context,
                       rootDirectory: Directory("/"),
-                      directory: movementManager.getPath().isNotEmpty
-                          ? Directory(movementManager.getPath())
+                      directory: configManager.getPath().isNotEmpty
+                          ? Directory(configManager.getPath())
                           : Directory(Util.getUserDirectory()),
                       fsType: FilesystemType.folder,
                       pickText: 'Pick folder',
                     ) ??
-                        movementManager.getPath();
+                        configManager.getPath();
                     setState(() {
                       openFolder(folder);
-                      movementManager.setPath(folder);
+                      configManager.setPath(folder);
                     });
                   },
                   child: const Text("Open folder")),
@@ -210,7 +210,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       bottomNavigationBar: FutureBuilder(
-        future: movementManager.init(),
+        future: configManager.init(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Wrap(
@@ -224,7 +224,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<ElevatedButton> generateBtns() {
-    return movementManager.getAlias().entries
+    return configManager.getAlias().entries
         .map((e) => ElevatedButton(
             onPressed: () {
               move(e.value);

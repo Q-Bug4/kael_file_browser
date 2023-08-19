@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:localstore/localstore.dart';
 
-class MovementManager {
+class ConfigManager {
   Map<String, dynamic>? local = {};
   final db = Localstore.instance;
   final String collectionName;
   final String docName;
 
-  MovementManager({required this.collectionName, required this.docName});
+  ConfigManager({required this.collectionName, required this.docName});
 
   Future<void> init() async {
     local = await db.collection(collectionName).doc(docName).get();
@@ -44,6 +44,3 @@ class MovementManager {
     setLocal(local!);
   }
 }
-
-
-
