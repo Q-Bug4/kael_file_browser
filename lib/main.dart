@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:kael_file_browser/FileManager.dart';
 import 'package:kael_file_browser/ConfigManager.dart';
 import 'package:kael_file_browser/media_player.dart';
-import 'package:kael_file_browser/MoveHistory.dart';
 import 'package:kael_file_browser/side_fileinfo.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
@@ -44,6 +43,7 @@ class _HomePageState extends State<HomePage> {
   ConfigManager configManager = ConfigManager(collectionName: "custom_movement", docName: "kael_file_browser");
 
   void openFolder(String path) {
+    // avoid to open the same folder
     if (fileManager.isNotEmpty() && path == configManager.getPath()) {
       return;
     }
@@ -59,10 +59,7 @@ class _HomePageState extends State<HomePage> {
           .map((e) => File(e.path))
           .toList();
       fileManager.setFiles(files);
-      // items.sort((a, b) => b.lengthSync() - a.lengthSync());
-      if (fileManager.isNotEmpty()) {
-        playCurrentFile();
-      }
+      playCurrentFile();
     });
   }
 
@@ -71,6 +68,8 @@ class _HomePageState extends State<HomePage> {
       File? file = fileManager.getCurrentFile();
       if (file != null) {
         mediaPlayer.play(file);
+      } else {
+        mediaPlayer.resetFile();
       }
     });
   }
@@ -91,11 +90,7 @@ class _HomePageState extends State<HomePage> {
     } on Exception catch (e) {
       Util.showInfoDialog(context, "Undo Move Exception", e.toString());
     }
-    if (fileManager.isNotEmpty()) {
-      playCurrentFile();
-    } else {
-      mediaPlayer.resetFile();
-    }
+    playCurrentFile();
   }
 
   @override
