@@ -9,7 +9,6 @@ import 'package:kael_file_browser/side_fileinfo.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:dart_vlc/dart_vlc.dart';
-import 'package:path/path.dart' as Path;
 import 'package:json_editor/json_editor.dart';
 
 void main() async {
@@ -77,41 +76,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   void move(String dst) {
-    if (fileManager.isEmpty()) {
-      return;
-    }
-    File file = fileManager.getCurrentFile()!;
-    MoveHistory moveHistory =
-        MoveHistory(src: file.path, dst: "$dst/${Path.basename(file.path)}");
     mediaPlayer.resetFile();
-    String errMsg = moveHistory.doMove();
-    if (errMsg.isNotEmpty) {
-      Util.showInfoDialog(context, "Movement error", errMsg);
-      return;
+    try {
+      fileManager.moveFileTo(dst);
+    } on Exception catch (e) {
+      Util.showInfoDialog(context, "Move Exception", e.toString());
     }
-    fileManager.addHistory(moveHistory);
-    removeItemOffList();
-  }
-
-  void undoMovement() {
-    if (fileManager.isHistoryEmpty()) {
-      return;
-    }
-    MoveHistory moveHistory = fileManager.popLastHistory();
-    String errMsg = moveHistory.undo();
-    if (errMsg.isNotEmpty) {
-      Util.showInfoDialog(context, "Movement error", errMsg);
-      return;
-    }
-    fileManager.addFileBeforeCur(File(moveHistory.src));
     playCurrentFile();
   }
 
-  void removeItemOffList() {
-    if (fileManager.isEmpty()) {
-      return;
+  void undoMovement() {
+    try {
+      fileManager.undoMovement();
+    } on Exception catch (e) {
+      Util.showInfoDialog(context, "Undo Move Exception", e.toString());
     }
-    fileManager.removeCurFile();
     if (fileManager.isNotEmpty()) {
       playCurrentFile();
     } else {

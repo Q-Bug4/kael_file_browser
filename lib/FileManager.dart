@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:path/path.dart' as Path;
 
 import 'MoveHistory.dart';
 
@@ -98,5 +99,31 @@ class FileManager {
 
   MoveHistory popLastHistory() {
     return movements.removeLast();
+  }
+
+  void moveFileTo(String dst) {
+    if (isEmpty()) {
+      return;
+    }
+    File file = getCurrentFile()!;
+    MoveHistory moveHistory = MoveHistory(src: file.path, dst: "$dst/${Path.basename(file.path)}");
+    String errMsg = moveHistory.doMove();
+    if (errMsg.isNotEmpty) {
+      throw Exception("Movement error: $errMsg");
+    }
+    addHistory(moveHistory);
+    removeCurFile();
+  }
+
+  void undoMovement() {
+    if (isHistoryEmpty()) {
+      return;
+    }
+    MoveHistory moveHistory = popLastHistory();
+    String errMsg = moveHistory.undo();
+    if (errMsg.isNotEmpty) {
+      throw Exception("Movement undo error: $errMsg");
+    }
+    addFileBeforeCur(File(moveHistory.src));
   }
 }
