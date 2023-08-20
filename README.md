@@ -21,7 +21,11 @@ For now, just tested this app on Linux.
 - [x] Click media player to play/pause instead of clicking button
 - [x] Cur time at left; end time at right
 - [ ] Refactor code - continuous
+  - [ ] Use interface
+  - [ ] Add unit test
 - [ ] Gif control 
+- [ ] Move config quick save
+- [ ] Default move dst 
 - [ ] Shortcut
 - [ ] Custom Shortcut
 - [ ] ~~Custom bottom button and shell/script~~
@@ -29,6 +33,6 @@ For now, just tested this app on Linux.
 ## Bugs
 - [x] Controll bar position overflow
 - [x] Set play blank after move the lastest file
-- [ ] init local movement
+- [x] init local movement
 - [ ] Can not open files whose filename contains `#`
 - [ ] (In process) Broken file cause crash
