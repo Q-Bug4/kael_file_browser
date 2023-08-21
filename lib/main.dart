@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kael_file_browser/FileManager.dart';
 import 'package:kael_file_browser/ConfigManager.dart';
+import 'package:kael_file_browser/MoveBar.dart';
 import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/side_fileinfo.dart';
 import 'package:kael_file_browser/util.dart';
@@ -184,24 +185,11 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: FutureBuilder(
         future: configManager.init(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Wrap(
-              children: generateBtns(),
-            );
-          }
-          return const Wrap(children: [],);
+          return (snapshot.connectionState == ConnectionState.done)
+              ? MoveBar(configManager.getAlias(), move)
+              : Container();
         },
       ),
     );
-  }
-
-  List<ElevatedButton> generateBtns() {
-    return configManager.getAlias().entries
-        .map((e) => ElevatedButton(
-            onPressed: () {
-              move(e.value);
-            },
-            child: Text(e.key)))
-        .toList();
   }
 }
