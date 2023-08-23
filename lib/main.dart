@@ -112,33 +112,7 @@ class _HomePageState extends State<HomePage> {
                   child: const Text("Undo")),
               ElevatedButton(
                   onPressed: () async {
-                    String jsonStr = "";
-                    showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("Edit your movement"),
-                          content: JsonEditor.object(
-                            object: configManager.getLocal(),
-                            onValueChanged: (val) {
-                              jsonStr = val.toString();
-                            },
-                          ),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  setState(() {
-                                    configManager.setLocal(jsonDecode(jsonStr));
-                                  });
-                                },
-                                child: const Text("OK")),
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Cancel"))
-                          ],
-                        ));
+                    showConfigDialog();
                   },
                   child: const Text("Move conf")),
               ElevatedButton(
@@ -191,5 +165,36 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+  }
+
+  String showConfigDialog() {
+    String jsonStr = "";
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text("Edit your movement"),
+              content: JsonEditor.object(
+                object: configManager.getLocal(),
+                onValueChanged: (val) {
+                  jsonStr = val.toString();
+                },
+              ),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        configManager.setLocal(jsonDecode(jsonStr));
+                      });
+                    },
+                    child: const Text("OK")),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Cancel"))
+              ],
+            ));
+    return jsonStr;
   }
 }
