@@ -1,19 +1,26 @@
 import 'dart:io';
+import 'package:filesystem_picker/filesystem_picker.dart';
+import 'package:kael_file_browser/ConfigManager.dart';
+import 'package:kael_file_browser/FileManager.dart';
+import 'package:kael_file_browser/media_player.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:path/path.dart' as Path;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SideFileInfo extends StatefulWidget {
-  List<File> files;
-  List<ElevatedButton> btns;
-  Function changeIdx;
+  FileManager fileManager;
+  MediaPlayer mediaPlayer;
+  ConfigManager configManager;
+  Function showDialog;
 
   SideFileInfo(
       {Key? key,
-      required this.files,
-      required this.changeIdx,
-      required this.btns})
+        required this.fileManager,
+        required this.configManager,
+        required this.mediaPlayer,
+        required this.showDialog
+      })
       : super(key: key);
 
   @override
@@ -21,7 +28,6 @@ class SideFileInfo extends StatefulWidget {
 }
 
 class _SideFileInfoState extends State<SideFileInfo> {
-  late List<File> files;
   late double width;
   bool expanded = true;
   String sortValue = "Name";
@@ -35,17 +41,33 @@ class _SideFileInfoState extends State<SideFileInfo> {
   void sort() {
     switch (sortValue) {
       case "Size":
-        widget.files.sort(
+        widget.fileManager.getAllFile().sort(
             (a, b) => (sortDesc ? 1 : -1) * (b.lengthSync() - a.lengthSync()));
         break;
       case "Name":
-        widget.files
+        widget.fileManager.getAllFile()
             .sort((a, b) => (sortDesc ? 1 : -1) * b.path.compareTo(a.path));
 
         break;
       default:
     }
-    widget.changeIdx(0);
+    changeIdx(0);
+  }
+
+  void changeIdx(idx) {
+    widget.fileManager.setFileAt(idx);
+    playCurrentFile();
+  }
+
+  void playCurrentFile() {
+    setState(() {
+      File? file = widget.fileManager.getCurrentFile();
+      if (file != null) {
+        widget.mediaPlayer.play(file);
+      } else {
+        widget.mediaPlayer.resetFile();
+      }
+    });
   }
 
   @override
@@ -57,7 +79,7 @@ class _SideFileInfoState extends State<SideFileInfo> {
   @override
   Widget build(BuildContext context) {
     List<String> files =
-        widget.files.map((e) => Path.basename(e.path)).toList();
+        widget.fileManager.getAllFile().map((e) => Path.basename(e.path)).toList();
     List<TextButton> fileBtns = List.empty(growable: true);
     for (int i = 0; i < files.length; i++) {
       final TextStyle style = i == idx
@@ -67,7 +89,7 @@ class _SideFileInfoState extends State<SideFileInfo> {
         onPressed: () {
           setState(() {
             idx = i;
-            widget.changeIdx(idx);
+            changeIdx(idx);
           });
         },
         child: Text(files[i], style: style),
@@ -81,20 +103,20 @@ class _SideFileInfoState extends State<SideFileInfo> {
       )),
       Container(
           height: 100,
-          child: expanded && widget.files.isNotEmpty
+          child: expanded && widget.fileManager.isNotEmpty()
               ? Column(children: [
                   Expanded(
                       child: ListView(
                     children: [
                       Text(
-                        "Uri: ${widget.files[idx].path}",
+                        "Uri: ${widget.fileManager.getOneFile(idx)!.path}",
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.indigo),
                       ),
                       Row(
                         children: [
                           Text(
-                            "  Size: ${Util.getReadableFileSize(widget.files[idx].lengthSync())}",
+                            "  Size: ${Util.getReadableFileSize(widget.fileManager.getOneFile(idx)!.lengthSync())}",
                             textAlign: TextAlign.center,
                             style: const TextStyle(color: Colors.teal),
                           ),
@@ -143,8 +165,53 @@ class _SideFileInfoState extends State<SideFileInfo> {
       Container(
         child: expanded
             ? Wrap(
-                children: widget.btns,
-              )
+                children: List<ElevatedButton>.of(<ElevatedButton>[
+                  ElevatedButton(
+                      onPressed: () {
+                        undoMovement();
+                      },
+                      child: const Text("Undo")),
+                  ElevatedButton(
+                      onPressed: () async {
+                        setState(() {
+                          widget.showDialog();
+                        });
+                      },
+                      child: const Text("Move conf")),
+                  ElevatedButton(
+                      onPressed: () async {
+                        String folder = await FilesystemPicker.open(
+                          title: 'Open folder',
+                          context: context,
+                          rootDirectory: Directory("/"),
+                          directory: widget.configManager.getPath().isNotEmpty
+                              ? Directory(widget.configManager.getPath())
+                              : Directory(Util.getUserDirectory()),
+                          fsType: FilesystemType.folder,
+                          pickText: 'Pick folder',
+                        ) ??
+                            widget.configManager.getPath();
+                        setState(() {
+                          openFolder(folder);
+                          widget.configManager.setPath(folder);
+                        });
+                      },
+                      child: const Text("Open folder")),
+                  ElevatedButton(
+                      onPressed: () {
+                        widget.fileManager.lastFile();
+                        playCurrentFile();
+                      },
+                      child: const Text("Last")),
+                  ElevatedButton(
+                      onPressed: () {
+                        widget.fileManager.nextFile();
+                        playCurrentFile();
+                      },
+                      child: const Text("Next")),
+                ]),
+
+        )
             : const Wrap(),
       ),
       Container(
@@ -162,5 +229,35 @@ class _SideFileInfoState extends State<SideFileInfo> {
     ]);
 
     return Container(width: width, child: content);
+  }
+
+  void undoMovement() {
+    try {
+      widget.fileManager.undoMovement();
+    } on Exception catch (e) {
+      Util.showInfoDialog(context, "Undo Move Exception", e.toString());
+    }
+    playCurrentFile();
+  }
+
+  void openFolder(String path) {
+    // avoid to open the same folder
+    if (widget.fileManager.isNotEmpty() && path == widget.configManager.getPath()) {
+      return;
+    }
+    Directory.current = Directory(path);
+    widget.configManager.setPath(path);
+    setState(() {
+      List<File> files = Directory(path)
+          .listSync()
+          .where((p) =>
+      Util.isGif(p.path) ||
+          Util.isImage(p.path) ||
+          Util.isVideo(p.path))
+          .map((e) => File(e.path))
+          .toList();
+      widget.fileManager.setFiles(files);
+      playCurrentFile();
+    });
   }
 }
