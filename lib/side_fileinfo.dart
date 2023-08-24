@@ -16,11 +16,10 @@ class SideFileInfo extends StatefulWidget {
 
   SideFileInfo(
       {Key? key,
-        required this.fileManager,
-        required this.configManager,
-        required this.mediaPlayer,
-        required this.showDialog
-      })
+      required this.fileManager,
+      required this.configManager,
+      required this.mediaPlayer,
+      required this.showDialog})
       : super(key: key);
 
   @override
@@ -45,9 +44,9 @@ class _SideFileInfoState extends State<SideFileInfo> {
             (a, b) => (sortDesc ? 1 : -1) * (b.lengthSync() - a.lengthSync()));
         break;
       case "Name":
-        widget.fileManager.getAllFile()
+        widget.fileManager
+            .getAllFile()
             .sort((a, b) => (sortDesc ? 1 : -1) * b.path.compareTo(a.path));
-
         break;
       default:
     }
@@ -78,8 +77,10 @@ class _SideFileInfoState extends State<SideFileInfo> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> files =
-        widget.fileManager.getAllFile().map((e) => Path.basename(e.path)).toList();
+    List<String> files = widget.fileManager
+        .getAllFile()
+        .map((e) => Path.basename(e.path))
+        .toList();
     List<TextButton> fileBtns = List.empty(growable: true);
     for (int i = 0; i < files.length; i++) {
       final TextStyle style = i == idx
@@ -181,15 +182,17 @@ class _SideFileInfoState extends State<SideFileInfo> {
                   ElevatedButton(
                       onPressed: () async {
                         String folder = await FilesystemPicker.open(
-                          title: 'Open folder',
-                          context: context,
-                          rootDirectory: Directory("/"),
-                          directory: widget.configManager.getPath().isNotEmpty
-                              ? Directory(widget.configManager.getPath())
-                              : Directory(Util.getUserDirectory()),
-                          fsType: FilesystemType.folder,
-                          pickText: 'Pick folder',
-                        ) ??
+                              title: 'Open folder',
+                              context: context,
+                              rootDirectory: Directory("/"),
+                              directory: widget.configManager
+                                      .getPath()
+                                      .isNotEmpty
+                                  ? Directory(widget.configManager.getPath())
+                                  : Directory(Util.getUserDirectory()),
+                              fsType: FilesystemType.folder,
+                              pickText: 'Pick folder',
+                            ) ??
                             widget.configManager.getPath();
                         setState(() {
                           openFolder(folder);
@@ -210,8 +213,7 @@ class _SideFileInfoState extends State<SideFileInfo> {
                       },
                       child: const Text("Next")),
                 ]),
-
-        )
+              )
             : const Wrap(),
       ),
       Container(
@@ -242,7 +244,8 @@ class _SideFileInfoState extends State<SideFileInfo> {
 
   void openFolder(String path) {
     // avoid to open the same folder
-    if (widget.fileManager.isNotEmpty() && path == widget.configManager.getPath()) {
+    if (widget.fileManager.isNotEmpty() &&
+        path == widget.configManager.getPath()) {
       return;
     }
     Directory.current = Directory(path);
@@ -251,9 +254,9 @@ class _SideFileInfoState extends State<SideFileInfo> {
       List<File> files = Directory(path)
           .listSync()
           .where((p) =>
-      Util.isGif(p.path) ||
-          Util.isImage(p.path) ||
-          Util.isVideo(p.path))
+              Util.isGif(p.path) ||
+              Util.isImage(p.path) ||
+              Util.isVideo(p.path))
           .map((e) => File(e.path))
           .toList();
       widget.fileManager.setFiles(files);

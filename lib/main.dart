@@ -40,7 +40,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   FileManager fileManager = FileManager(List<File>.empty());
   MediaPlayer mediaPlayer = MediaPlayer();
-  ConfigManager configManager = ConfigManager(collectionName: "custom_movement", docName: "kael_file_browser");
+  ConfigManager configManager = ConfigManager(
+      collectionName: "custom_movement",
+      docName: "kael_file_browser"
+  );
 
   void playCurrentFile() {
     setState(() {
@@ -71,7 +74,11 @@ class _HomePageState extends State<HomePage> {
           Expanded(
             child: mediaPlayer,
           ),
-          SideFileInfo(fileManager: fileManager, configManager: configManager, mediaPlayer: mediaPlayer, showDialog: showConfigDialog,
+          SideFileInfo(
+            fileManager: fileManager,
+            configManager: configManager,
+            mediaPlayer: mediaPlayer,
+            showDialog: showConfigDialog,
           ),
         ],
       ),
