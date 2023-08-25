@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:kael_file_browser/ConfigManager.dart';
 import 'package:kael_file_browser/FileManager.dart';
-import 'package:kael_file_browser/media_player.dart';
+import 'package:kael_file_browser/MediaPlayer.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:path/path.dart' as Path;
 import 'package:flutter/cupertino.dart';
