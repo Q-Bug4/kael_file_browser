@@ -19,7 +19,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  static const String _title = 'Flutter Code Sample';
+  static const String _title = 'X File Filter';
 
   @override
   Widget build(BuildContext context) {
