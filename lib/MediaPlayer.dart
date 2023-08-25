@@ -76,7 +76,8 @@ class _MediaPlayerState extends State<MediaPlayer>
     isGifPlaying = true;
     try {
       if (Util.isVideo(file.path)) {
-        var media = Media.file(file);
+        // Media.file() can't open file whose name contains '#'
+        var media = Media.asset(file.path);
         player.open(media);
       }
     } catch (e) {

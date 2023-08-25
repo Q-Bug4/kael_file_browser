@@ -34,5 +34,5 @@ For now, just tested this app on Linux.
 - [x] Controll bar position overflow
 - [x] Set play blank after move the lastest file
 - [x] init local movement
-- [ ] Can not open files whose filename contains `#`
+- [x] Can not open files whose filename contains `#`
 - [ ] (In process) Broken file cause crash
