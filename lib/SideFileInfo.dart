@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:filesystem_picker/filesystem_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:kael_file_browser/ConfigManager.dart';
 import 'package:kael_file_browser/FileManager.dart';
 import 'package:kael_file_browser/MediaPlayer.dart';
@@ -181,19 +181,11 @@ class _SideFileInfoState extends State<SideFileInfo> {
                       child: const Text("Move conf")),
                   ElevatedButton(
                       onPressed: () async {
-                        String folder = await FilesystemPicker.open(
-                              title: 'Open folder',
-                              context: context,
-                              rootDirectory: Directory("/"),
-                              directory: widget.configManager
-                                      .getPath()
-                                      .isNotEmpty
-                                  ? Directory(widget.configManager.getPath())
-                                  : Directory(Util.getUserDirectory()),
-                              fsType: FilesystemType.folder,
-                              pickText: 'Pick folder',
-                            ) ??
-                            widget.configManager.getPath();
+                        String folder = await FilePicker.platform.getDirectoryPath(
+                          dialogTitle: "Pick your directory",
+                          lockParentWindow: false,
+                          initialDirectory: widget.configManager.getPath()
+                        ) ?? widget.configManager.getPath();
                         setState(() {
                           openFolder(folder);
                           widget.configManager.setPath(folder);

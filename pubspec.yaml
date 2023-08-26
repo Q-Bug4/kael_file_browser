@@ -30,13 +30,11 @@ dependencies:
   flutter:
     sdk: flutter
   photo_view: 0.14.0
-  filesystem_picker: ^3.0.0
   dart_vlc: ^0.3.0
+  file_picker: ^4.6.1
   localstore: ^1.2.3
   gif: ^2.1.2
   sidebarx: ^0.12.0
-
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
