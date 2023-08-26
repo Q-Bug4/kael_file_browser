@@ -8,12 +8,12 @@ import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 
 class SideFileInfo extends StatefulWidget {
-  FileManager fileManager;
-  MediaPlayer mediaPlayer;
-  ConfigManager configManager;
-  Function showDialog;
+  final FileManager fileManager;
+  final MediaPlayer mediaPlayer;
+  final ConfigManager configManager;
+  final Function showDialog;
 
-  SideFileInfo(
+  const SideFileInfo(
       {Key? key,
       required this.fileManager,
       required this.configManager,
