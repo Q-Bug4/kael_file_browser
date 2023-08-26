@@ -4,8 +4,7 @@ import 'package:kael_file_browser/ConfigManager.dart';
 import 'package:kael_file_browser/FileManager.dart';
 import 'package:kael_file_browser/MediaPlayer.dart';
 import 'package:kael_file_browser/util.dart';
-import 'package:path/path.dart' as Path;
-import 'package:flutter/cupertino.dart';
+import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
 
 class SideFileInfo extends StatefulWidget {
@@ -79,7 +78,7 @@ class _SideFileInfoState extends State<SideFileInfo> {
   Widget build(BuildContext context) {
     List<String> files = widget.fileManager
         .getAllFile()
-        .map((e) => Path.basename(e.path))
+        .map((e) => path.basename(e.path))
         .toList();
     List<TextButton> fileBtns = List.empty(growable: true);
     for (int i = 0; i < files.length; i++) {
