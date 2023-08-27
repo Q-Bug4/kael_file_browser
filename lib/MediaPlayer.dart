@@ -115,19 +115,6 @@ class _MediaPlayerState extends State<MediaPlayer>
               autostart: Autostart.once,
               image: FileImage(file)),
         ),
-        // Container(
-        //     height: 40,
-        //     child: AnimatedBuilder(
-        //       animation: gifController,
-        //       builder: (context, child) {
-        //         return Slider(
-        //             value: gifController.value.toDouble(),
-        //             onChanged: (position) {
-        //               gifController.value = position;
-        //               isGifPlaying = false;
-        //             });
-        //       },
-        //     ))
       ]);
     } else if (Util.isVideo(file.path)) {
       widget = Column(children: [
@@ -178,7 +165,6 @@ class _MediaPlayerState extends State<MediaPlayer>
 
   @override
   void dispose() {
-    // gifController.dispose();
     super.dispose();
   }
 
