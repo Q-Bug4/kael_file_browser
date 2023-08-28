@@ -40,10 +40,6 @@ class FileManager {
     movements.clear();
   }
 
-  void addFileToLast(File file) {
-    files.add(file);
-  }
-
   void addFileBeforeCur(File file) {
     files.insert(curIdx, file);
   }
@@ -70,13 +66,6 @@ class FileManager {
   void setFileAt(index) {
     if (isNotEmpty()) {
       curIdx = index;
-      rectifyIndex();
-    }
-  }
-
-  void removeFileAt(index) {
-    if (isNotEmpty()) {
-      files.removeAt(index);
       rectifyIndex();
     }
   }
