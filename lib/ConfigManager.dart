@@ -32,7 +32,16 @@ class ConfigManager {
     String activate = local!['activate'];
     String movementStr = json.encode(local!['cases'][activate]);
     return Map<String, dynamic>.from(jsonDecode(movementStr))
-        .map((key, value) => MapEntry(key, value.toString()));
+        .map((key, value) => MapEntry(key, value.toString()))
+        .map((key, value) => MapEntry(key, defaultDst(key, value)));
+  }
+
+  /// while given movement value is empty, use key as the dst folder
+  String defaultDst(String key, String dst) {
+    if (dst == "") {
+      return key;
+    }
+    return dst;
   }
 
   String getPath() {
