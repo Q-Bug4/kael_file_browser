@@ -95,7 +95,8 @@ class FileManager {
       return;
     }
     File file = getCurrentFile()!;
-    MoveHistory moveHistory = MoveHistory(src: file.path, dst: "$dst/${Path.basename(file.path)}");
+    MoveHistory moveHistory =
+        MoveHistory(src: file.path, dst: "$dst/${Path.basename(file.path)}");
     String errMsg = moveHistory.doMove();
     if (errMsg.isNotEmpty) {
       throw Exception("Movement error: $errMsg");

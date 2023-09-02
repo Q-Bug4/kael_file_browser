@@ -135,17 +135,18 @@ class _MediaPlayerState extends State<MediaPlayer>
             child: Row(
               children: [
                 Text(formatDuration(player.position.position)),
-                Expanded(child: Slider(
-                    min: 0,
-                    max: position.duration!.inMilliseconds.toDouble(),
-                    value: position.position!.inMilliseconds.toDouble(),
-                    onChanged: (position) {
-                      player.seek(
-                        Duration(
-                          milliseconds: position.toInt(),
-                        ),
-                      );
-                    })),
+                Expanded(
+                    child: Slider(
+                        min: 0,
+                        max: position.duration!.inMilliseconds.toDouble(),
+                        value: position.position!.inMilliseconds.toDouble(),
+                        onChanged: (position) {
+                          player.seek(
+                            Duration(
+                              milliseconds: position.toInt(),
+                            ),
+                          );
+                        })),
                 Text(formatDuration(player.position.duration)),
               ],
             ))

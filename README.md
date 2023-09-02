@@ -20,12 +20,13 @@ For now, just tested this app on Linux.
 - [x] Move control button into sidebar
 - [x] Click media player to play/pause instead of clicking button
 - [x] Cur time at left; end time at right
+- [x] Default move dst
+- [ ] Use `setState` correctly
 - [ ] Refactor code - continuous
   - [ ] Use interface
   - [ ] Add unit test
 - [ ] Gif control 
 - [ ] Move config quick save
-- [ ] Default move dst 
 - [ ] Shortcut
 - [ ] Custom Shortcut
 - [ ] ~~Custom bottom button and shell/script~~

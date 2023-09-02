@@ -6,6 +6,7 @@ class MoveHistory {
     required this.src,
     required this.dst,
   });
+
   String src = "";
   String dst = "";
   bool done = false;

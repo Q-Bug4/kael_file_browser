@@ -41,9 +41,7 @@ class _HomePageState extends State<HomePage> {
   FileManager fileManager = FileManager(List<File>.empty());
   MediaPlayer mediaPlayer = MediaPlayer();
   ConfigManager configManager = ConfigManager(
-      collectionName: "custom_movement",
-      docName: "kael_file_browser"
-  );
+      collectionName: "custom_movement", docName: "kael_file_browser");
 
   void playCurrentFile() {
     setState(() {
