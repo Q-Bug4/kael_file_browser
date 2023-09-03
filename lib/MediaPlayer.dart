@@ -5,6 +5,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:kael_file_browser/players/AbstructPlayer.dart';
 import 'package:kael_file_browser/players/GifPlayer.dart';
 import 'package:kael_file_browser/players/PhotoPlayer.dart';
+import 'package:kael_file_browser/players/TextPlayer.dart';
 import 'package:kael_file_browser/players/VideoPlayer.dart';
 import 'package:kael_file_browser/util.dart';
 
@@ -34,34 +35,35 @@ class _MediaPlayerState extends State<MediaPlayer>
     with TickerProviderStateMixin {
   final File EMPTY_FILE = File('');
   late File file;
-  VideoPlayer videoPlayer = VideoPlayer();
+  late AbstractPlayer player = TextPlayer("Please open folder to start.");
 
   void resetFile() {
     file = EMPTY_FILE;
-    videoPlayer.stop();
   }
 
   void playOrPause() {
     if (!file.existsSync()) {
       return;
     }
-    if (Util.isVideo(file.path)) {
-      videoPlayer.playOrPause();
-    }
+    player.playOrPause();
     setState(() {});
   }
 
   void play(File? f) {
+    player.stop();
     file = f ?? file;
-
-    try {
-      if (Util.isVideo(file.path)) {
-        videoPlayer.play(file);
-      }
-    } catch (e) {
-      Util.showInfoDialog(context, 'Vlc Error', e.toString());
+    if (Util.isImage(file.path)) {
+      player = PhotoPlayer(file);
+    } else if (Util.isGif(file.path)) {
+      player = GifPlayer();
+    } else if (Util.isVideo(file.path)) {
+      player = VideoPlayer();
+    } else {
+      player = TextPlayer("Please choose a file or open folder to start.");
     }
-    setState(() {});
+    setState(() {
+      player.play(file);
+    });
   }
 
   @override
@@ -72,20 +74,6 @@ class _MediaPlayerState extends State<MediaPlayer>
 
   @override
   Widget build(BuildContext context) {
-    AbstractPlayer player;
-    print("MediaPlayer rebuilding...");
-    if (Util.isImage(file.path)) {
-      player = PhotoPlayer(file);
-    } else if (Util.isGif(file.path)) {
-      player = GifPlayer();
-    } else if (Util.isVideo(file.path)) {
-      player = videoPlayer;
-    } else {
-      return const Text("Please pick a folder");
-    }
-    player.stop();
-    player.play(file);
-
     return player;
   }
 }
