@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:gif/gif.dart';
+import 'package:kael_file_browser/players/VideoPlayer.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:photo_view/photo_view.dart';
 
@@ -36,13 +37,12 @@ class _MediaPlayerState extends State<MediaPlayer>
   bool isGifPlaying = true;
   final File EMPTY_FILE = File('');
   late File file;
-  Player player = Player(id: 60002);
-  PositionState position = PositionState();
+  VideoPlayer videoPlayer = VideoPlayer();
   bool shouldAutoOpen = false;
 
   void resetFile() {
     file = EMPTY_FILE;
-    player.stop();
+    videoPlayer.stop();
   }
 
   void playOrPause() {
@@ -57,13 +57,9 @@ class _MediaPlayerState extends State<MediaPlayer>
       }
       isGifPlaying = !isGifPlaying;
     } else if (Util.isVideo(file.path)) {
-      if (position.position?.inMilliseconds ==
-          position.duration?.inMilliseconds) {
-        play(file);
-      } else {
-        player.playOrPause();
-      }
+      videoPlayer.playOrPause();
     }
+    setState(() {});
   }
 
   void play(File? f) {
@@ -73,34 +69,26 @@ class _MediaPlayerState extends State<MediaPlayer>
     try {
       if (Util.isVideo(file.path)) {
         // Media.file() can't open file whose name contains '#'
-        var media = Media.asset(file.path);
-        player.open(media);
+        // var media = Media.asset(file.path);
+        videoPlayer.play(file);
       }
     } catch (e) {
       Util.showInfoDialog(context, 'Vlc Error', e.toString());
     }
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
     // gifController = GifController(vsync: this);
-
     resetFile();
-    player.positionStream.listen((PositionState state) {
-      if (state.duration!.inMilliseconds == 0) {
-        return;
-      }
-      shouldAutoOpen = false;
-      setState(() {
-        position = state;
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     Widget widget;
+    print("MediaPlayer rebuilding...");
     if (Util.isImage(file.path)) {
       widget = PhotoView(imageProvider: FileImage(file));
     } else if (Util.isGif(file.path)) {
@@ -113,47 +101,14 @@ class _MediaPlayerState extends State<MediaPlayer>
         ),
       ]);
     } else if (Util.isVideo(file.path)) {
-      widget = Column(children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              playOrPause();
-            },
-            child: Video(
-              player: player,
-              scale: 1.0, // default
-              showControls: false,
-            ),
-          ),
-        ),
-        Container(
-            height: 40,
-            child: Row(
-              children: [
-                Text(formatDuration(player.position.position)),
-                Expanded(
-                    child: Slider(
-                        min: 0,
-                        max: position.duration!.inMilliseconds.toDouble(),
-                        value: position.position!.inMilliseconds.toDouble(),
-                        onChanged: (position) {
-                          player.seek(
-                            Duration(
-                              milliseconds: position.toInt(),
-                            ),
-                          );
-                        })),
-                Text(formatDuration(player.position.duration)),
-              ],
-            ))
-      ]);
+      widget = videoPlayer;
     } else {
       return const Text("Please pick a folder");
     }
     if (!Util.isVideo(file.path)) {
-      player.pause();
+      videoPlayer.stop();
     } else if (shouldAutoOpen) {
-      play(file);
+      videoPlayer.play(file);
     }
     shouldAutoOpen = true;
 

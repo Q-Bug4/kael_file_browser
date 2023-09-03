@@ -1,7 +1,7 @@
 # kael_file_browser
 A simple Flutter project to open, move, delete or run script to deal with your photos and videos.
 
-For now, just tested this app on Linux.
+For now, just tested this app on Linux and Windows 10.
 ## TODO
 - [x] View photo
 - [x] View video
@@ -21,7 +21,7 @@ For now, just tested this app on Linux.
 - [x] Click media player to play/pause instead of clicking button
 - [x] Cur time at left; end time at right
 - [x] Default move dst
-- [ ] Use `setState` correctly
+- [x] Use `setState` correctly
 - [ ] Refactor code - continuous
   - [ ] Use interface
   - [ ] Add unit test
