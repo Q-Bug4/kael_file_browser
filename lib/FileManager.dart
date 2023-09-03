@@ -49,20 +49,6 @@ class FileManager {
     rectifyIndex();
   }
 
-  void nextFile() {
-    if (isNotEmpty()) {
-      curIdx++;
-      rectifyIndex();
-    }
-  }
-
-  void lastFile() {
-    if (isNotEmpty()) {
-      curIdx--;
-      rectifyIndex();
-    }
-  }
-
   void setFileAt(index) {
     if (isNotEmpty()) {
       curIdx = index;

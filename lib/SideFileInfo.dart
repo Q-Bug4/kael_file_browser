@@ -181,18 +181,6 @@ class _SideFileInfoState extends State<SideFileInfo> {
                         widget.configManager.setPath(folder);
                       },
                       child: const Text("Open folder")),
-                  ElevatedButton(
-                      onPressed: () {
-                        widget.fileManager.lastFile();
-                        playCurrentFile();
-                      },
-                      child: const Text("Last")),
-                  ElevatedButton(
-                      onPressed: () {
-                        widget.fileManager.nextFile();
-                        playCurrentFile();
-                      },
-                      child: const Text("Next")),
                 ]),
               )
             : const Wrap(),
