@@ -2,9 +2,11 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 
 abstract class AbstractPlayer extends StatefulWidget {
-  void playOrPause();
+  const AbstractPlayer({super.key});
 
-  void stop();
+  void playOrPause() {}
 
-  void play(File file);
+  void stop() {}
+
+  void play(File file) {}
 }
