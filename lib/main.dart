@@ -44,14 +44,14 @@ class _HomePageState extends State<HomePage> {
       collectionName: "custom_movement", docName: "kael_file_browser");
 
   void playCurrentFile() {
-    setState(() {
       File? file = fileManager.getCurrentFile();
       if (file != null) {
-        mediaPlayer.play(file);
+        setState(() {
+          mediaPlayer.play(file);
+        });
       } else {
         mediaPlayer.resetFile();
       }
-    });
   }
 
   void move(String dst) {

@@ -41,10 +41,8 @@ class _MediaPlayerState extends State<MediaPlayer>
   bool shouldAutoOpen = false;
 
   void resetFile() {
-    setState(() {
-      file = EMPTY_FILE;
-      player.stop();
-    });
+    file = EMPTY_FILE;
+    player.stop();
   }
 
   void playOrPause() {
@@ -69,9 +67,7 @@ class _MediaPlayerState extends State<MediaPlayer>
   }
 
   void play(File? f) {
-    setState(() {
-      file = f ?? file;
-    });
+    file = f ?? file;
 
     isGifPlaying = true;
     try {

@@ -49,23 +49,23 @@ class _SideFileInfoState extends State<SideFileInfo> {
         break;
       default:
     }
+    setState(() {});
     changeIdx(0);
   }
 
   void changeIdx(idx) {
     widget.fileManager.setFileAt(idx);
+    setState(() {});
     playCurrentFile();
   }
 
   void playCurrentFile() {
-    setState(() {
-      File? file = widget.fileManager.getCurrentFile();
-      if (file != null) {
-        widget.mediaPlayer.play(file);
-      } else {
-        widget.mediaPlayer.resetFile();
-      }
-    });
+    File? file = widget.fileManager.getCurrentFile();
+    if (file != null) {
+      widget.mediaPlayer.play(file);
+    } else {
+      widget.mediaPlayer.resetFile();
+    }
   }
 
   @override
@@ -87,10 +87,8 @@ class _SideFileInfoState extends State<SideFileInfo> {
           : const TextStyle(color: Colors.black);
       fileBtns.add(TextButton(
         onPressed: () {
-          setState(() {
-            idx = i;
-            changeIdx(idx);
-          });
+          idx = i;
+          changeIdx(idx);
         },
         child: Text(files[i], style: style),
       ));
@@ -131,29 +129,23 @@ class _SideFileInfoState extends State<SideFileInfo> {
                               value: "Name",
                               groupValue: sortValue,
                               onChanged: (v) {
-                                setState(() {
-                                  sortValue = v.toString();
-                                  sort();
-                                });
+                                sortValue = v.toString();
+                                sort();
                               }),
                           Text("Name"),
                           Radio(
                               value: "Size",
                               groupValue: sortValue,
                               onChanged: (v) {
-                                setState(() {
-                                  sortValue = v.toString();
-                                  sort();
-                                });
+                                sortValue = v.toString();
+                                sort();
                               }),
                           Text("Size"),
                           Checkbox(
                               value: sortDesc,
                               onChanged: (v) {
-                                setState(() {
-                                  sortDesc = !sortDesc;
-                                  sort();
-                                });
+                                sortDesc = !sortDesc;
+                                sort();
                               }),
                           Text("Reverse"),
                         ],
@@ -173,9 +165,7 @@ class _SideFileInfoState extends State<SideFileInfo> {
                       child: const Text("Undo")),
                   ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          widget.showDialog();
-                        });
+                        widget.showDialog();
                       },
                       child: const Text("Move conf")),
                   ElevatedButton(
@@ -187,10 +177,8 @@ class _SideFileInfoState extends State<SideFileInfo> {
                                     initialDirectory:
                                         widget.configManager.getPath()) ??
                             widget.configManager.getPath();
-                        setState(() {
-                          openFolder(folder);
-                          widget.configManager.setPath(folder);
-                        });
+                        openFolder(folder);
+                        widget.configManager.setPath(folder);
                       },
                       child: const Text("Open folder")),
                   ElevatedButton(
@@ -253,7 +241,7 @@ class _SideFileInfoState extends State<SideFileInfo> {
           .map((e) => File(e.path))
           .toList();
       widget.fileManager.setFiles(files);
-      playCurrentFile();
     });
+    playCurrentFile();
   }
 }
