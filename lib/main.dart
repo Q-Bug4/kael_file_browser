@@ -50,12 +50,12 @@ class _HomePageState extends State<HomePage> {
           mediaPlayer.play(file);
         });
       } else {
-        mediaPlayer.resetFile();
+        mediaPlayer.stop();
       }
   }
 
   void move(String dst) {
-    mediaPlayer.resetFile();
+    mediaPlayer.stop();
     try {
       fileManager.moveFileTo(dst);
     } on Exception catch (e) {

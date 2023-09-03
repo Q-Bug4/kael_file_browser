@@ -64,7 +64,7 @@ class _SideFileInfoState extends State<SideFileInfo> {
     if (file != null) {
       widget.mediaPlayer.play(file);
     } else {
-      widget.mediaPlayer.resetFile();
+      widget.mediaPlayer.stop();
     }
   }
 
