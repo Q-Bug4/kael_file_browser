@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:kael_file_browser/players/AbstructPlayer.dart';
+import 'package:kael_file_browser/players/AbstractPlayer.dart';
 
 class GifPlayer extends AbstractPlayer {
   _GifPlayerState state = _GifPlayerState();

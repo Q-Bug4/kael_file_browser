@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:kael_file_browser/players/AbstructPlayer.dart';
+import 'package:kael_file_browser/players/AbstractPlayer.dart';
 import 'package:kael_file_browser/players/GifPlayer.dart';
 import 'package:kael_file_browser/players/PhotoPlayer.dart';
 import 'package:kael_file_browser/players/TextPlayer.dart';

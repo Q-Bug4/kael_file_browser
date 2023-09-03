@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:kael_file_browser/players/AbstructPlayer.dart';
+import 'package:kael_file_browser/players/AbstractPlayer.dart';
 import 'package:kael_file_browser/util.dart';
 
 class VideoPlayer extends AbstractPlayer {
