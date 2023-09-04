@@ -7,8 +7,8 @@ class MoveHistory {
     required this.dst,
   });
 
-  String src = "";
-  String dst = "";
+  final String src;
+  final String dst;
   bool done = false;
 
   doMove() {
