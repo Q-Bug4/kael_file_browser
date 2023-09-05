@@ -101,20 +101,20 @@ class _SideFileInfoState extends State<SideFileInfo> {
       )),
       Container(
           height: 100,
-          child: expanded && widget.fileManager.isNotEmpty()
+          child: expanded && !widget.fileManager.isEmpty()
               ? Column(children: [
                   Expanded(
                       child: ListView(
                     children: [
                       Text(
-                        "Uri: ${widget.fileManager.getOneFile(idx)!.path}",
+                        "Uri: ${widget.fileManager.getCurrentFile()!.path}",
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.indigo),
                       ),
                       Row(
                         children: [
                           Text(
-                            "  Size: ${Util.getReadableFileSize(widget.fileManager.getOneFile(idx)!.lengthSync())}",
+                            "  Size: ${Util.getReadableFileSize(widget.fileManager.getCurrentFile()!.lengthSync())}",
                             textAlign: TextAlign.center,
                             style: const TextStyle(color: Colors.teal),
                           ),
@@ -213,22 +213,14 @@ class _SideFileInfoState extends State<SideFileInfo> {
 
   void openFolder(String path) {
     // avoid to open the same folder
-    if (widget.fileManager.isNotEmpty() &&
+    if (!widget.fileManager.isEmpty() &&
         path == widget.configManager.getPath()) {
       return;
     }
     Directory.current = Directory(path);
     widget.configManager.setPath(path);
     setState(() {
-      List<File> files = Directory(path)
-          .listSync()
-          .where((p) =>
-              Util.isGif(p.path) ||
-              Util.isImage(p.path) ||
-              Util.isVideo(p.path))
-          .map((e) => File(e.path))
-          .toList();
-      widget.fileManager.setFiles(files);
+      widget.fileManager.readFilesOfDir(path);
     });
     playCurrentFile();
   }

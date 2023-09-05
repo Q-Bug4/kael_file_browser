@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:kael_file_browser/util.dart';
 import 'package:path/path.dart' as Path;
 
 import 'MoveHistory.dart';
@@ -19,14 +20,6 @@ class FileManager {
     return files.isEmpty;
   }
 
-  bool isNotEmpty() {
-    return files.isNotEmpty;
-  }
-
-  File? getOneFile(index) {
-    return isEmpty() ? null : files[index];
-  }
-
   File? getCurrentFile() {
     return isEmpty() ? null : files[curIdx];
   }
@@ -35,45 +28,29 @@ class FileManager {
     return files;
   }
 
-  void setFiles(List<File> files) {
+  /// list files in dir and replace held files
+  void readFilesOfDir(String path) {
+    List<File> files = Directory(path)
+        .listSync()
+    // TODO move file format validation into other component
+        .where((p) =>
+            Util.isGif(p.path) || Util.isImage(p.path) || Util.isVideo(p.path))
+        .map((e) => File(e.path))
+        .toList();
     this.files = files;
     movements.clear();
   }
 
-  void addFileBeforeCur(File file) {
-    files.insert(curIdx, file);
-  }
-
-  void removeCurFile() {
-    files.removeAt(curIdx);
+  void setFileAt(index) {
+    if (isEmpty()) {
+      return;
+    }
+    curIdx = index;
     rectifyIndex();
   }
 
-  void setFileAt(index) {
-    if (isNotEmpty()) {
-      curIdx = index;
-      rectifyIndex();
-    }
-  }
-
   void rectifyIndex() {
-    if (isNotEmpty()) {
-      curIdx = (curIdx + files.length) % files.length;
-    } else {
-      curIdx = 0;
-    }
-  }
-
-  void addHistory(MoveHistory history) {
-    movements.add(history);
-  }
-
-  bool isHistoryEmpty() {
-    return movements.isEmpty;
-  }
-
-  MoveHistory popLastHistory() {
-    return movements.removeLast();
+    curIdx = isEmpty() ? 0 : (curIdx + files.length) % files.length;
   }
 
   void moveFileTo(String dst) {
@@ -87,19 +64,20 @@ class FileManager {
     if (errMsg.isNotEmpty) {
       throw Exception("Movement error: $errMsg");
     }
-    addHistory(moveHistory);
-    removeCurFile();
+    movements.add(moveHistory);
+    files.removeAt(curIdx);
+    rectifyIndex();
   }
 
   void undoMovement() {
-    if (isHistoryEmpty()) {
+    if (movements.isEmpty) {
       return;
     }
-    MoveHistory moveHistory = popLastHistory();
+    MoveHistory moveHistory = movements.removeLast();
     String errMsg = moveHistory.undo();
     if (errMsg.isNotEmpty) {
       throw Exception("Movement undo error: $errMsg");
     }
-    addFileBeforeCur(File(moveHistory.src));
+    files.insert(curIdx, File(moveHistory.src));
   }
 }
