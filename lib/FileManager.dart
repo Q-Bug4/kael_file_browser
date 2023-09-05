@@ -46,10 +46,10 @@ class FileManager {
       return;
     }
     curIdx = index;
-    rectifyIndex();
+    _rectifyIndex();
   }
 
-  void rectifyIndex() {
+  void _rectifyIndex() {
     curIdx = isEmpty() ? 0 : (curIdx + files.length) % files.length;
   }
 
@@ -66,7 +66,7 @@ class FileManager {
     }
     movements.add(moveHistory);
     files.removeAt(curIdx);
-    rectifyIndex();
+    _rectifyIndex();
   }
 
   void undoMovement() {
