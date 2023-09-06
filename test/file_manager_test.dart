@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kael_file_browser/FileManager.dart';
+import 'package:mockito/annotations.dart';
 
+@GenerateMocks([Directory])
 void main() {
   group("FileManager file holding", () {
     test("should be empty", () {
@@ -61,6 +63,9 @@ void main() {
   group("FileManager file movement", () {
     // TODO directory list mocking
     test("should list files in dir", () {
+      List<File> files = [File("first"), File("second"), File("last")];
+      var fileManager = FileManager(files);
+      fileManager.readFilesOfDir("/");
 
     });
 
