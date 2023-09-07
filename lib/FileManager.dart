@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:kael_file_browser/FileSystemUtil.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:path/path.dart' as Path;
 
@@ -7,8 +8,12 @@ import 'MoveHistory.dart';
 class FileManager {
   FileManager(this.files);
 
+  FileManager.withUtil(this.files, this.fileSystemUtil);
+
+  late FileSystemUtil fileSystemUtil;
+
   /// files to manage
-  List<File> files;
+  late List<File> files;
 
   /// move history
   List<MoveHistory> movements = List.empty(growable: true);
@@ -30,12 +35,10 @@ class FileManager {
 
   /// list files in dir and replace held files
   void readFilesOfDir(String path) {
-    List<File> files = Directory(path)
-        .listSync()
+    List<File> files = fileSystemUtil.listFiles(path)
     // TODO move file format validation into other component
         .where((p) =>
             Util.isGif(p.path) || Util.isImage(p.path) || Util.isVideo(p.path))
-        .map((e) => File(e.path))
         .toList();
     this.files = files;
     movements.clear();
@@ -60,7 +63,7 @@ class FileManager {
     File file = getCurrentFile()!;
     MoveHistory moveHistory =
         MoveHistory(src: file.path, dst: "$dst/${Path.basename(file.path)}");
-    String errMsg = moveHistory.doMove();
+    String errMsg = fileSystemUtil.moveFile(moveHistory.src, moveHistory.dst);
     if (errMsg.isNotEmpty) {
       throw Exception("Movement error: $errMsg");
     }
@@ -74,7 +77,7 @@ class FileManager {
       return;
     }
     MoveHistory moveHistory = movements.removeLast();
-    String errMsg = moveHistory.undo();
+    String errMsg = fileSystemUtil.moveFile(moveHistory.dst, moveHistory.src);
     if (errMsg.isNotEmpty) {
       throw Exception("Movement undo error: $errMsg");
     }

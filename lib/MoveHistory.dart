@@ -9,27 +9,5 @@ class MoveHistory {
 
   final String src;
   final String dst;
-  bool done = false;
 
-  doMove() {
-    if (done || dst.isEmpty || src.isEmpty) {
-      return;
-    }
-    String errMsg = Util.moveFile(src, dst);
-    if (errMsg.isEmpty) {
-      done = true;
-    }
-    return errMsg;
-  }
-
-  undo() {
-    if (dst.isEmpty || src.isEmpty) {
-      return;
-    }
-    String errMsg = Util.moveFile(dst, src);
-    if (errMsg.isEmpty) {
-      done = false;
-    }
-    return errMsg;
-  }
 }
