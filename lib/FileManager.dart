@@ -6,7 +6,9 @@ import 'package:path/path.dart' as Path;
 import 'MoveHistory.dart';
 
 class FileManager {
-  FileManager(this.files);
+  FileManager(this.files) {
+    fileSystemUtil = FileSystemUtil();
+  }
 
   FileManager.withUtil(this.files, this.fileSystemUtil);
 
