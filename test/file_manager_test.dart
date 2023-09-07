@@ -2,9 +2,14 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kael_file_browser/FileManager.dart';
+import 'package:kael_file_browser/FileSystemUtil.dart';
+import 'package:kael_file_browser/MoveHistory.dart';
 import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 
-@GenerateMocks([Directory])
+import 'file_manager_test.mocks.dart';
+
+@GenerateMocks([FileSystemUtil])
 void main() {
   group("FileManager file holding", () {
     test("should be empty", () {
@@ -61,22 +66,56 @@ void main() {
   });
 
   group("FileManager file movement", () {
-    // TODO directory list mocking
     test("should list files in dir", () {
-      List<File> files = [File("first"), File("second"), File("last")];
-      var fileManager = FileManager(files);
+      final stubFileSystemUtil = MockFileSystemUtil();
+      var expectedFiles = [File("stubFile1.mp4")];
+      when(stubFileSystemUtil.listFiles("/")).thenReturn(expectedFiles);
+
+      var fileManager = FileManager.withUtil([], stubFileSystemUtil);
       fileManager.readFilesOfDir("/");
 
+      expect(fileManager.getAllFile(), expectedFiles);
     });
 
-    // TODO undo movement mocking
-    test("should bring file back when file is moved", () {
+    test("should filter unexpect files when not media file in dir", () {
+      final stubFileSystemUtil = MockFileSystemUtil();
+      var expectedFiles = [File("stubFile1.mp4"), File("notExceptedFile.abc")];
+      when(stubFileSystemUtil.listFiles("/")).thenReturn(expectedFiles);
 
+      var fileManager = FileManager.withUtil([], stubFileSystemUtil);
+      fileManager.readFilesOfDir("/");
+
+      expect(fileManager.getAllFile(), [expectedFiles.first]);
     });
 
-    // TODO move file mocking
     test("should move file when given correct dst", () {
+      final stubFileSystemUtil = MockFileSystemUtil();
+      bool moved = false;
+      MoveHistory history = MoveHistory(src: "/src/stubFile.mp4", dst: "/dst/stubFile.mp4");
+      when(stubFileSystemUtil.moveFile(history.src, history.dst)).thenAnswer((realInvocation) {
+        moved = true;
+        return "";
+      });
 
+      var fileManager = FileManager.withUtil([File("/src/stubFile.mp4")], stubFileSystemUtil);
+      fileManager.moveFileTo("/dst");
+      expect(moved, true);
+    });
+
+    test("should bring file back when file is moved", () {
+      final stubFileSystemUtil = MockFileSystemUtil();
+      bool isUndo = false;
+      MoveHistory history = MoveHistory(src: "/src/stubFile.mp4", dst: "/dst/stubFile.mp4");
+      when(stubFileSystemUtil.moveFile(history.src, history.dst)).thenReturn("");
+      when(stubFileSystemUtil.moveFile(history.dst, history.src)).thenAnswer((realInvocation) {
+        isUndo = true;
+        return "";
+      });
+
+      var fileManager = FileManager.withUtil([File("/src/stubFile.mp4")], stubFileSystemUtil);
+      fileManager.moveFileTo("/dst");
+      fileManager.undoMovement();
+      expect(isUndo, true);
     });
   });
 }
