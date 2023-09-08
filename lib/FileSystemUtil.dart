@@ -5,20 +5,14 @@ class FileSystemUtil {
     return Directory(path).listSync().map((e) => File(e.path)).toList();
   }
 
-  String moveFile(String src, String dst) {
-    String msg = "";
+  void moveFile(String src, String dst) {
     if (src.isEmpty || dst.isEmpty) {
-      return msg;
+      return;
     }
-    try {
-      File dstTmp = File(dst);
-      if (!dstTmp.existsSync()) {
-        dstTmp.parent.createSync(recursive: true);
-      }
-      File(src).renameSync(dst);
-    } catch (e) {
-      msg = e.toString();
+    File dstTmp = File(dst);
+    if (!dstTmp.existsSync()) {
+      dstTmp.parent.createSync(recursive: true);
     }
-    return msg;
+    File(src).renameSync(dst);
   }
 }

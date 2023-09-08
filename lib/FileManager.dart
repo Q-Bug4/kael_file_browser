@@ -65,10 +65,7 @@ class FileManager {
     File file = getCurrentFile()!;
     MoveHistory moveHistory =
         MoveHistory(src: file.path, dst: "$dst/${Path.basename(file.path)}");
-    String errMsg = fileSystemUtil.moveFile(moveHistory.src, moveHistory.dst);
-    if (errMsg.isNotEmpty) {
-      throw Exception("Movement error: $errMsg");
-    }
+    fileSystemUtil.moveFile(moveHistory.src, moveHistory.dst);
     movements.add(moveHistory);
     files.removeAt(curIdx);
     _rectifyIndex();
@@ -79,10 +76,7 @@ class FileManager {
       return;
     }
     MoveHistory moveHistory = movements.removeLast();
-    String errMsg = fileSystemUtil.moveFile(moveHistory.dst, moveHistory.src);
-    if (errMsg.isNotEmpty) {
-      throw Exception("Movement undo error: $errMsg");
-    }
+    fileSystemUtil.moveFile(moveHistory.dst, moveHistory.src);
     files.insert(curIdx, File(moveHistory.src));
   }
 }

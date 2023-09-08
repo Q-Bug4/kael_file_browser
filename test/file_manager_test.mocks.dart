@@ -36,11 +36,11 @@ class MockFileSystemUtil extends _i1.Mock implements _i2.FileSystemUtil {
         returnValue: <_i3.File>[],
       ) as List<_i3.File>);
   @override
-  String moveFile(
+  void moveFile(
     String? src,
     String? dst,
   ) =>
-      (super.noSuchMethod(
+      super.noSuchMethod(
         Invocation.method(
           #moveFile,
           [
@@ -48,6 +48,6 @@ class MockFileSystemUtil extends _i1.Mock implements _i2.FileSystemUtil {
             dst,
           ],
         ),
-        returnValue: '',
-      ) as String);
+        returnValueForMissingStub: null,
+      );
 }
