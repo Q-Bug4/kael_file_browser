@@ -30,7 +30,11 @@ class ConfigManager {
 
   Map<String, String> getAlias() {
     String activate = local!['activate'];
-    String movementStr = json.encode(local!['cases'][activate]);
+    var activateCase = local!['cases'][activate];
+    if (activateCase == null) {
+      return Map.identity();
+    }
+    String movementStr = json.encode(activateCase);
     return Map<String, dynamic>.from(jsonDecode(movementStr))
         .map((key, value) => MapEntry(key, value.toString()))
         .map((key, value) => MapEntry(key, defaultDst(key, value)));
