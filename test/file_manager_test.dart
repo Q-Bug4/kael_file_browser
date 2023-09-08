@@ -94,12 +94,20 @@ void main() {
       MoveHistory history = MoveHistory(src: "/src/stubFile.mp4", dst: "/dst/stubFile.mp4");
       when(stubFileSystemUtil.moveFile(history.src, history.dst)).thenAnswer((realInvocation) {
         moved = true;
-        return "";
       });
 
       var fileManager = FileManager.withUtil([File("/src/stubFile.mp4")], stubFileSystemUtil);
       fileManager.moveFileTo("/dst");
       expect(moved, true);
+    });
+
+    test("should throw exception when move error", () {
+      final stubFileSystemUtil = MockFileSystemUtil();
+      MoveHistory history = MoveHistory(src: "/src/stubFile.mp4", dst: "/dst/stubFile.mp4");
+      when(stubFileSystemUtil.moveFile(history.src, history.dst)).thenThrow(Exception("stub exception"));
+
+      var fileManager = FileManager.withUtil([File("/src/stubFile.mp4")], stubFileSystemUtil);
+      expect(() => fileManager.moveFileTo("/dst"), throwsA(isA<Exception>()));
     });
 
     test("should bring file back when file is moved", () {
@@ -109,13 +117,22 @@ void main() {
       when(stubFileSystemUtil.moveFile(history.src, history.dst)).thenReturn("");
       when(stubFileSystemUtil.moveFile(history.dst, history.src)).thenAnswer((realInvocation) {
         isUndo = true;
-        return "";
       });
 
       var fileManager = FileManager.withUtil([File("/src/stubFile.mp4")], stubFileSystemUtil);
       fileManager.moveFileTo("/dst");
       fileManager.undoMovement();
       expect(isUndo, true);
+    });
+
+    test("should throw exception when undo move error", () {
+      final stubFileSystemUtil = MockFileSystemUtil();
+      MoveHistory history = MoveHistory(src: "/src/stubFile.mp4", dst: "/dst/stubFile.mp4");
+      when(stubFileSystemUtil.moveFile(history.dst, history.src)).thenThrow(Exception("stub exception"));
+
+      var fileManager = FileManager.withUtil([File("/src/stubFile.mp4")], stubFileSystemUtil);
+      fileManager.moveFileTo("/dst");
+      expect(() => fileManager.undoMovement(), throwsA(isA<Exception>()));
     });
   });
 }
