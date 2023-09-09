@@ -1,18 +1,20 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:localstore/localstore.dart';
+import 'package:kael_file_browser/LocalStorageRepository.dart';
 
 class ConfigManager {
   Map<String, dynamic>? local = {};
-  final db = Localstore.instance;
+  late LocalStorageRepository repository;
   final String collectionName;
   final String docName;
 
-  ConfigManager({required this.collectionName, required this.docName});
+  ConfigManager({required this.collectionName, required this.docName}) {
+    repository = LocalStorageRepository(collectionName, docName);
+  }
 
   Future<void> init() async {
-    local = await db.collection(collectionName).doc(docName).get();
+    local = await repository.getConfig();
     if (local == null) {
       var jsonStr = await rootBundle.loadString('assets/emptyMovement.json');
       setLocal(json.decode(jsonStr));
@@ -20,8 +22,7 @@ class ConfigManager {
   }
 
   setLocal(Map<String, dynamic> map) {
-    db.collection(collectionName).doc(docName).set(map).then((value) => {});
-    local = map;
+    repository.setConfig(map).then((ignored) => local = map);
   }
 
   getLocal() {
@@ -37,11 +38,11 @@ class ConfigManager {
     String movementStr = json.encode(activateCase);
     return Map<String, dynamic>.from(jsonDecode(movementStr))
         .map((key, value) => MapEntry(key, value.toString()))
-        .map((key, value) => MapEntry(key, defaultDst(key, value)));
+        .map((key, value) => MapEntry(key, _defaultDst(key, value)));
   }
 
   /// while given movement value is empty, use key as the dst folder
-  String defaultDst(String key, String dst) {
+  String _defaultDst(String key, String dst) {
     if (dst == "") {
       return key;
     }
