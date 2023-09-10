@@ -1,31 +1,40 @@
 import 'dart:convert';
 
-import 'package:flutter/services.dart';
+import 'package:kael_file_browser/AssetRepository.dart';
 import 'package:kael_file_browser/LocalStorageRepository.dart';
 
 class ConfigManager {
   Map<String, dynamic>? local = {};
   late LocalStorageRepository repository;
+  late AssetRepository assetRepository;
   final String collectionName;
   final String docName;
 
   ConfigManager({required this.collectionName, required this.docName}) {
     repository = LocalStorageRepository(collectionName, docName);
+    assetRepository = AssetRepository();
   }
+
+  ConfigManager.withRepo(
+      {required this.collectionName,
+      required this.docName,
+      required this.repository,
+      required this.assetRepository});
 
   Future<void> init() async {
     local = await repository.getConfig();
     if (local == null) {
-      var jsonStr = await rootBundle.loadString('assets/emptyMovement.json');
-      setLocal(json.decode(jsonStr));
+      var jsonStr = await assetRepository.loadAssetFile('assets/emptyMovement.json');
+      await setLocal(json.decode(jsonStr));
     }
   }
 
-  setLocal(Map<String, dynamic> map) {
-    repository.setConfig(map).then((ignored) => local = map);
+  setLocal(Map<String, dynamic> map) async {
+    await repository.setConfig(map);
+    local = map;
   }
 
-  getLocal() {
+  Map<String, dynamic>? getLocal() {
     return local;
   }
 
@@ -53,7 +62,7 @@ class ConfigManager {
     return local!['path'];
   }
 
-  setPath(path) {
+  setPath(path) async {
     local!['path'] = path;
     setLocal(local!);
   }
