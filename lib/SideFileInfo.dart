@@ -170,13 +170,15 @@ class _SideFileInfoState extends State<SideFileInfo> {
                       child: const Text("Move conf")),
                   ElevatedButton(
                       onPressed: () async {
-                        String folder = await FilePicker.platform
+                        String? folder = await FilePicker.platform
                                 .getDirectoryPath(
                                     dialogTitle: "Pick your directory",
                                     lockParentWindow: false,
                                     initialDirectory:
-                                        widget.configManager.getPath()) ??
-                            widget.configManager.getPath();
+                                        widget.configManager.getPath());
+                        if (folder == null) {
+                          return;
+                        }
                         openFolder(folder);
                         widget.configManager.setPath(folder);
                       },
