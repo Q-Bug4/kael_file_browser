@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 
 class MoveBar extends StatelessWidget {
@@ -47,16 +48,28 @@ class MoveBar extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           mainButton,
-          DropdownButton<Entry>(
-              selectedItemBuilder: (ctx) =>
-                  [for (final _ in menuItems) Container()],
-              disabledHint: Container(),
+          DropdownButtonHideUnderline(
+            child: DropdownButton2(
+              customButton: const Icon(
+                Icons.list,
+                size: 25,
+                color: Colors.cyan,
+              ),
               items: menuItems,
               onChanged: (entry) {
-                print("item changed: ");
-                print(entry);
-                btnCallback(entry!._dst);
-              }),
+                btnCallback((entry! as Entry)._dst);
+              },
+              dropdownStyleData: DropdownStyleData(
+                width: 160,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  color: Colors.cyan,
+                ),
+                offset: const Offset(0, 8),
+              ),
+            ),
+          ),
         ],
       ),
     );
