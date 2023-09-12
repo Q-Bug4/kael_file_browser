@@ -29,7 +29,7 @@ void main() {
       when(mockRepo.getConfig()).thenAnswer((_) => Future(() => null));
 
       MockAssetRepository stubAssetRepo = MockAssetRepository();
-      when(stubAssetRepo.loadAssetFile('assets/emptyMovement.json')).thenAnswer((_) => Future(() => "{}"));
+      when(stubAssetRepo.loadAssetFile('assets/initConfig.json')).thenAnswer((_) => Future(() => "{}"));
 
       ConfigManager manager = ConfigManager.withRepo(collectionName: "colTest", docName: "docTest", repository: mockRepo, assetRepository: stubAssetRepo);
       await manager.init();
@@ -42,7 +42,7 @@ void main() {
       when(stubRepo.setConfig(any)).thenAnswer((_) => Future(() => null));
 
       MockAssetRepository stubAssetRepo = MockAssetRepository();
-      when(stubAssetRepo.loadAssetFile('assets/emptyMovement.json')).thenAnswer((_) => Future(() => "{}"));
+      when(stubAssetRepo.loadAssetFile('assets/initConfig.json')).thenAnswer((_) => Future(() => "{}"));
 
       ConfigManager manager = ConfigManager.withRepo(collectionName: "colTest", docName: "docTest", repository: stubRepo, assetRepository: stubAssetRepo);
       await manager.init();
@@ -98,7 +98,7 @@ void main() {
 
       ConfigManager manager = ConfigManager.withRepo(collectionName: "colTest", docName: "docTest", repository: stubRepo, assetRepository: AssetRepository());
       await manager.setLocal({'activate': 'test', 'cases': {}});
-      var alias = manager.getAlias();
+      var alias = manager.getMovements();
       expect(alias.isEmpty, true);
     });
 
@@ -109,7 +109,7 @@ void main() {
       ConfigManager manager = ConfigManager.withRepo(collectionName: "colTest", docName: "docTest", repository: stubRepo, assetRepository: AssetRepository());
       var movementMap = {};
       await manager.setLocal({'activate': 'test', 'cases': {'test': movementMap}});
-      var alias = manager.getAlias();
+      var alias = manager.getMovements();
       expect(alias, movementMap);
     });
   });

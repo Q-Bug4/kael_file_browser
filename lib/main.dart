@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> {
         future: configManager.init(),
         builder: (context, snapshot) {
           return (snapshot.connectionState == ConnectionState.done)
-              ? MoveBar(configManager.getAlias(), move)
+              ? MoveBar(configManager.getMovements(), move)
               : Container();
         },
       ),

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class MoveBar extends StatelessWidget {
   final btnHeight = 30.0;
 
-  /// To generate buttons when key is button text, value is movement dst
+  /// To generate buttons when key is button text, value is move history dst
   final Map<String, String> name2Dst;
 
   /// All buttons' click event
@@ -14,29 +14,29 @@ class MoveBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Entry> entries = generateEntries();
+    List<SubMovement> subMovements = generateEntries();
     return Wrap(
       spacing: 2,
-      children: entries.map((e) => buildButton(e)).toList(),
+      children: subMovements.map((e) => buildButton(e)).toList(),
     );
   }
 
-  Widget buildButton(Entry entry) {
+  Widget buildButton(SubMovement subMovement) {
     var mainButton = Container(
         height: btnHeight,
         child: ElevatedButton(
             onPressed: () {
-              btnCallback(entry._dst);
+              btnCallback(subMovement._dst);
             },
-            child: Text(entry._name)));
-    if (!entry.hasChildren()) {
+            child: Text(subMovement._name)));
+    if (!subMovement.hasChildren()) {
       return mainButton;
     }
 
-    List<DropdownMenuItem<Entry>> menuItems = [];
-    for (MapEntry<String, String> child in entry._children.entries) {
+    List<DropdownMenuItem<SubMovement>> menuItems = [];
+    for (MapEntry<String, String> child in subMovement._children.entries) {
       menuItems.add(DropdownMenuItem(
-        value: Entry(child.key, child.value, {}),
+        value: SubMovement(child.key, child.value, {}),
         child: Text(child.key),
       ));
     }
@@ -57,7 +57,7 @@ class MoveBar extends StatelessWidget {
               ),
               items: menuItems,
               onChanged: (entry) {
-                btnCallback((entry! as Entry)._dst);
+                btnCallback((entry! as SubMovement)._dst);
               },
               dropdownStyleData: DropdownStyleData(
                 width: 160,
@@ -75,35 +75,32 @@ class MoveBar extends StatelessWidget {
     );
   }
 
-  /// convert list into structure that can
-  /// 1. diff bottom type
-  /// 2. describe relation
-  List<Entry> generateEntries() {
-    Map<String, Entry> entries = {};
+  List<SubMovement> generateEntries() {
+    Map<String, SubMovement> subMovements = {};
     for (String name in name2Dst.keys) {
       // $parent/$self
       int index = name.indexOf("/");
-      if (index == -1 && !entries.containsKey(name)) {
-        entries[name] = Entry(name, name2Dst[name]!, {});
+      if (index == -1 && !subMovements.containsKey(name)) {
+        subMovements[name] = SubMovement(name, name2Dst[name]!, {});
         continue;
       }
       String parent = name.substring(0, index);
       String self = name.substring(index + 1);
-      if (!entries.containsKey(parent)) {
-        entries[parent] = Entry(parent, name2Dst[parent]!, {});
+      if (!subMovements.containsKey(parent)) {
+        subMovements[parent] = SubMovement(parent, name2Dst[parent]!, {});
       }
-      entries[parent]!.addChildren(self, name2Dst[name]!);
+      subMovements[parent]!.addChildren(self, name2Dst[name]!);
     }
-    return entries.values.toList();
+    return subMovements.values.toList();
   }
 }
 
-class Entry {
+class SubMovement {
   final String _name;
   final String _dst;
   final Map<String, String> _children;
 
-  Entry(this._name, this._dst, this._children);
+  SubMovement(this._name, this._dst, this._children);
 
   void addChildren(String name, String dst) {
     _children[name] = dst;

@@ -24,7 +24,7 @@ class ConfigManager {
   Future<void> init() async {
     local = await repository.getConfig();
     if (local == null) {
-      var jsonStr = await assetRepository.loadAssetFile('assets/emptyMovement.json');
+      var jsonStr = await assetRepository.loadAssetFile('assets/initConfig.json');
       await setLocal(json.decode(jsonStr));
     }
   }
@@ -38,7 +38,7 @@ class ConfigManager {
     return local;
   }
 
-  Map<String, String> getAlias() {
+  Map<String, String> getMovements() {
     String activate = local!['activate'];
     var activateCase = local!['cases'][activate];
     if (activateCase == null) {

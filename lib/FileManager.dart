@@ -18,7 +18,7 @@ class FileManager {
   late List<File> files;
 
   /// move history
-  List<MoveHistory> movements = List.empty(growable: true);
+  List<MoveHistory> moveHistoryList = List.empty(growable: true);
 
   /// current handling file's index
   int curIdx = 0;
@@ -43,7 +43,7 @@ class FileManager {
             Util.isGif(p.path) || Util.isImage(p.path) || Util.isVideo(p.path))
         .toList();
     this.files = files;
-    movements.clear();
+    moveHistoryList.clear();
   }
 
   void setFileAt(index) {
@@ -66,16 +66,16 @@ class FileManager {
     MoveHistory moveHistory =
         MoveHistory(src: file.path, dst: "$dst/${Path.basename(file.path)}");
     fileSystemUtil.moveFile(moveHistory.src, moveHistory.dst);
-    movements.add(moveHistory);
+    moveHistoryList.add(moveHistory);
     files.removeAt(curIdx);
     _rectifyIndex();
   }
 
   void undoMovement() {
-    if (movements.isEmpty) {
+    if (moveHistoryList.isEmpty) {
       return;
     }
-    MoveHistory moveHistory = movements.removeLast();
+    MoveHistory moveHistory = moveHistoryList.removeLast();
     fileSystemUtil.moveFile(moveHistory.dst, moveHistory.src);
     files.insert(curIdx, File(moveHistory.src));
   }
