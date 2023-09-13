@@ -6,6 +6,23 @@ import 'package:kael_file_browser/players/AbstractPlayer.dart';
 import 'package:kael_file_browser/util.dart';
 
 class VideoPlayer extends AbstractPlayer {
+  static List<String> supportExt = [
+    '.mp4',
+    '.m4v',
+    '.mov',
+    '.wmv',
+    '.avi',
+    '.avchd',
+    '.flv,',
+    '.f4v,',
+    '.swf',
+    '.mkv'
+  ];
+
+  static bool support(String ext) {
+    return supportExt.contains(ext);
+  }
+
   _MediaPlayerState state = _MediaPlayerState();
 
   @override
@@ -88,11 +105,7 @@ class _MediaPlayerState extends State<VideoPlayer>
 
   @override
   Widget build(BuildContext context) {
-    Widget widget;
-    if (!Util.isVideo(file.path)) {
-      return const Text("Video player need to pick a folder.");
-    }
-    widget = Column(children: [
+    Widget widget = Column(children: [
       Expanded(
         child: GestureDetector(
           onTap: () {

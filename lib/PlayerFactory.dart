@@ -5,7 +5,7 @@ import 'package:kael_file_browser/players/GifPlayer.dart';
 import 'package:kael_file_browser/players/PhotoPlayer.dart';
 import 'package:kael_file_browser/players/TextPlayer.dart';
 import 'package:kael_file_browser/players/VideoPlayer.dart';
-import 'package:kael_file_browser/util.dart';
+import 'package:path/path.dart' as Path;
 
 class PlayerFactory {
   /// singleton
@@ -13,12 +13,13 @@ class PlayerFactory {
 
   /// get player depends on file type
   AbstractPlayer getPlayer(File file) {
+    String ext = Path.extension(file.path);
     AbstractPlayer player;
-    if (Util.isImage(file.path)) {
+    if (PhotoPlayer.support(ext)) {
       player = PhotoPlayer(file);
-    } else if (Util.isGif(file.path)) {
+    } else if (GifPlayer.support(ext)) {
       player = GifPlayer();
-    } else if (Util.isVideo(file.path)) {
+    } else if (VideoPlayer.support(ext)) {
       player = videoPlayer;
     } else {
       player = TextPlayer("Please choose a file or open folder to start.");

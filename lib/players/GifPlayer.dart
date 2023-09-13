@@ -4,6 +4,12 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:kael_file_browser/players/AbstractPlayer.dart';
 
 class GifPlayer extends AbstractPlayer {
+  static List<String> supportExt = ["gif"];
+
+  static bool support(String ext) {
+    return supportExt.contains(ext);
+  }
+
   _GifPlayerState state = _GifPlayerState();
 
   @override

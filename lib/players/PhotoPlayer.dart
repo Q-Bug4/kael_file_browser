@@ -5,6 +5,12 @@ import 'package:kael_file_browser/players/AbstractPlayer.dart';
 import 'package:photo_view/photo_view.dart';
 
 class PhotoPlayer extends AbstractPlayer {
+  static List<String> supportExt = ['.jpg', '.jpeg', '.png'];
+
+  static bool support(String ext) {
+    return supportExt.contains(ext);
+  }
+
   File file;
 
   PhotoPlayer(this.file);

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:kael_file_browser/FileSystemUtil.dart';
-import 'package:kael_file_browser/util.dart';
+import 'package:kael_file_browser/players/GifPlayer.dart';
+import 'package:kael_file_browser/players/PhotoPlayer.dart';
+import 'package:kael_file_browser/players/VideoPlayer.dart';
 import 'package:path/path.dart' as Path;
 
 import 'MoveHistory.dart';
@@ -37,13 +39,20 @@ class FileManager {
 
   /// list files in dir and replace held files
   void readFilesOfDir(String path) {
-    List<File> files = fileSystemUtil.listFiles(path)
-    // TODO move file format validation into other component
-        .where((p) =>
-            Util.isGif(p.path) || Util.isImage(p.path) || Util.isVideo(p.path))
+    List<File> files = fileSystemUtil
+        .listFiles(path)
+        // TODO move file format validation into other component
+        .where((file) => isFileSupported(file.path))
         .toList();
     this.files = files;
     moveHistoryList.clear();
+  }
+
+  bool isFileSupported(String path) {
+    String ext = Path.extension(path);
+    return VideoPlayer.support(ext) ||
+        PhotoPlayer.support(ext) ||
+        GifPlayer.support(ext);
   }
 
   void setFileAt(index) {
