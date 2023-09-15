@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -127,7 +128,8 @@ class _MediaPlayerState extends State<VideoPlayer>
                   child: Slider(
                       min: 0,
                       max: position.duration!.inMilliseconds.toDouble(),
-                      value: position.position!.inMilliseconds.toDouble(),
+                      value: min(position.position!.inMilliseconds.toDouble(),
+                          position.duration!.inMilliseconds.toDouble()),
                       onChanged: (position) {
                         player.seek(
                           Duration(
