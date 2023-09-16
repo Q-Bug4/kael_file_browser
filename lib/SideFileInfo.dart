@@ -160,7 +160,9 @@ class _SideFileInfoState extends State<SideFileInfo> {
                 children: List<ElevatedButton>.of(<ElevatedButton>[
                   ElevatedButton(
                       onPressed: () {
-                        undoMovement();
+                        setState(() {
+                          undoMovement();
+                        });
                       },
                       child: const Text("Undo")),
                   ElevatedButton(
