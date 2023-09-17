@@ -3,13 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kael_file_browser/FileManager.dart';
 import 'package:kael_file_browser/ConfigManager.dart';
-import 'package:kael_file_browser/FileSystemUtil.dart';
 import 'package:kael_file_browser/MoveBar.dart';
 import 'package:kael_file_browser/MediaPlayer.dart';
 import 'package:kael_file_browser/SideFileInfo.dart';
 import 'package:kael_file_browser/util.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:json_editor/json_editor.dart';
+import 'package:motion_toast/motion_toast.dart';
+import 'package:motion_toast/resources/arrays.dart';
 
 void main() async {
   await DartVLC.initialize(useFlutterNativeView: true);
@@ -45,20 +46,29 @@ class _HomePageState extends State<HomePage> {
       collectionName: "custom_movement", docName: "kael_file_browser");
 
   void playCurrentFile() {
-      File? file = fileManager.getCurrentFile();
-      if (file != null) {
-        setState(() {
-          mediaPlayer.play(file);
-        });
-      } else {
-        mediaPlayer.stop();
-      }
+    File? file = fileManager.getCurrentFile();
+    if (file != null) {
+      setState(() {
+        mediaPlayer.play(file);
+      });
+    } else {
+      mediaPlayer.stop();
+    }
   }
 
   void move(String dst) {
     mediaPlayer.stop();
     try {
       fileManager.moveFileTo(dst);
+      MotionToast.success(
+              position: MotionToastPosition.top,
+              toastDuration: const Duration(seconds: 1),
+              animationDuration: const Duration(milliseconds: 0),
+              enableAnimation: false,
+              animationType: AnimationType.fromTop,
+              title: const Text("File Movement"),
+              description: Text("Move file into $dst"))
+          .show(context);
     } on Exception catch (e) {
       Util.showInfoDialog(context, "Move Exception", e.toString());
     }
