@@ -1,5 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path;
 
 class MoveBar extends StatelessWidget {
   final btnHeight = 30.0;
@@ -35,8 +36,12 @@ class MoveBar extends StatelessWidget {
 
     List<DropdownMenuItem<SubMovement>> menuItems = [];
     for (MapEntry<String, String> child in subMovement._children.entries) {
+      // if value is empty, move file into sub folder(whose name is key) of main folder
+      var value = child.value == ''
+          ? path.join(subMovement._dst, child.key)
+          : child.value;
       menuItems.add(DropdownMenuItem(
-        value: SubMovement(child.key, child.value, {}),
+        value: SubMovement(child.key, value, {}),
         child: Text(child.key),
       ));
     }
